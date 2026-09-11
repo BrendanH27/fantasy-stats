@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy League Hub</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --hover-border: #38bdf8;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+        }
+
+        /* Hub Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .nav-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--hover-border);
+        }
+
+        .nav-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .nav-card.disabled:hover {
+            transform: none;
+            border-color: var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .card-desc {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+        }
+
+        .badge-coming {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-sub);
+        }
+
+        .card-action {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Fantasy League Hub</h1>
+        <p class="subtitle">Select a dashboard to view league insights, stats, and analytics.</p>
+    </header>
+
+    <div class="grid">
+        <!-- Active Efficiency Dashboard -->
+        <a href="efficiency.html" class="nav-card">
+            <div>
+                <div class="card-header">
+                    <span class="card-title">Efficiency & Scoring</span>
+                    <span class="badge badge-active">Live</span>
+                </div>
+                <p class="card-desc">Weekly optimal vs. actual points, bench metrics, and manager efficiency ratings.</p>
+            </div>
+            <span class="card-action">View Dashboard &rarr;</span>
+        </a>
+
+        <!-- Placeholder 1: Standings -->
+        <div class="nav-card disabled">
+            <div>
+                <div class="card-header">
+                    <span class="card-title">League Standings</span>
+                    <span class="badge badge-coming">Coming Soon</span>
+                </div>
+                <p class="card-desc">Current win-loss records, points for/against, and playoff seed projections.</p>
+            </div>
+            <span class="card-action" style="color: var(--text-sub)">Planned</span>
+        </div>
+
+        <!-- Placeholder 2: Head-to-Head / Matchups -->
+        <div class="nav-card disabled">
+            <div>
+                <div class="card-header">
+                    <span class="card-title">Matchup Breakdown</span>
+                    <span class="badge badge-coming">Coming Soon</span>
+                </div>
+                <p class="card-desc">Detailed weekly head-to-head results and luck-based schedule adjustments.</p>
+            </div>
+            <span class="card-action" style="color: var(--text-sub)">Planned</span>
+        </div>
+
+        <!-- Placeholder 3: Power Rankings -->
+        <div class="nav-card disabled">
+            <div>
+                <div class="card-header">
+                    <span class="card-title">Power Rankings</span>
+                    <span class="badge badge-coming">Coming Soon</span>
+                </div>
+                <p class="card-desc">Algorithmic team strength rankings based on moving performance averages.</p>
+            </div>
+            <span class="card-action" style="color: var(--text-sub)">Planned</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
