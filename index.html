@@ -167,20 +167,19 @@
     <div id="dashboard" class="hidden">
         <div class="controls">
             <div>
-                <label for="week-select">Select Week: </label>
+                <label for="week-select">View Segment: </label>
                 <select id="week-select"></select>
             </div>
             <div>
                 <label for="view-select">View Style: </label>
                 <select id="view-select">
+                    <option value="table" selected>Table</option>
                     <option value="cards">Cards</option>
-                    <option value="table">Table</option>
                 </select>
             </div>
         </div>
 
-        <div id="cards-view" class="grid"></div>
-        <div id="table-view" class="hidden">
+        <div id="table-view">
             <table>
                 <thead>
                     <tr>
@@ -190,11 +189,15 @@
                         <th>Optimal Points</th>
                         <th>Bench Points</th>
                         <th>Efficiency</th>
+                        <th>Season Total (Scored)</th>
+                        <th>Season Total (Optimal)</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
             </table>
         </div>
+        
+        <div id="cards-view" class="grid hidden"></div>
     </div>
 </div>
 
@@ -233,30 +236,46 @@
         const teams = Object.values(leagueData.teams);
         if (teams.length === 0) return;
 
-        // Populate Week Selector
         const totalWeeks = teams[0].weekly_points.length;
         const weekSelect = document.getElementById('week-select');
         weekSelect.innerHTML = '';
 
+        // Add regular weekly options
         for (let i = 1; i <= totalWeeks; i++) {
             const opt = document.createElement('option');
             opt.value = i - 1; // 0-indexed internally
-            opt.textContent = `Week ${i}`;
+            opt.textContent = i <= 14 ? `Week ${i}` : `Week ${i} (Playoffs)`;
             weekSelect.appendChild(opt);
+        }
+
+        // Add Post-Week 14 (Playoffs Aggregate) Option if data extends beyond week 14
+        if (totalWeeks > 14) {
+            const post14Opt = document.createElement('option');
+            post14Opt.value = 'post14';
+            post14Opt.textContent = `Playoffs Aggregate (Weeks 15–${totalWeeks})`;
+            weekSelect.appendChild(post14Opt);
         }
 
         // Show Dashboard
         document.getElementById('dashboard').classList.remove('hidden');
 
         // Render initial view (Week 1)
-        renderWeek(0);
+        renderData(0);
 
         // Attach Event Listeners
-        weekSelect.onchange = (e) => renderWeek(parseInt(e.target.value));
+        weekSelect.onchange = (e) => {
+            const val = e.target.value;
+            renderData(val === 'post14' ? 'post14' : parseInt(val));
+        };
         document.getElementById('view-select').onchange = toggleView;
     }
 
-    function renderWeek(weekIdx) {
+    function sumArrayRange(arr, start, end) {
+        if (!arr) return 0;
+        return arr.slice(start, end).reduce((sum, val) => sum + (val || 0), 0);
+    }
+
+    function renderData(selection) {
         const teams = Object.values(leagueData.teams);
         const cardsContainer = document.getElementById('cards-view');
         const tableBody = document.getElementById('table-body');
@@ -269,10 +288,45 @@
                 ? `${team.owner[0].firstName} ${team.owner[0].lastName}` 
                 : 'Unknown';
 
-            const pts = team.weekly_points[weekIdx]?.toFixed(2) || '0.00';
-            const optPts = team.weekly_optimal_points[weekIdx]?.toFixed(2) || '0.00';
-            const benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
-            const eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
+            let pts, optPts, benchPts, eff, seasonPts, seasonOpt;
+
+            if (selection === 'post14') {
+                // Post Week 14 aggregate calculations
+                const totalWeeks = team.weekly_points.length;
+                pts = sumArrayRange(team.weekly_points, 14, totalWeeks).toFixed(2);
+                optPts = sumArrayRange(team.weekly_optimal_points, 14, totalWeeks).toFixed(2);
+                benchPts = sumArrayRange(team.weekly_bench_points, 14, totalWeeks).toFixed(2);
+                eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
+
+                // Total season cumulative up through the available weeks
+                seasonPts = sumArrayRange(team.weekly_points, 0, totalWeeks).toFixed(2);
+                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, totalWeeks).toFixed(2);
+            } else {
+                // Single-week view with dynamic cumulative calculations up to selected week
+                const weekIdx = selection;
+                pts = team.weekly_points[weekIdx]?.toFixed(2) || '0.00';
+                optPts = team.weekly_optimal_points[weekIdx]?.toFixed(2) || '0.00';
+                benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
+                eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
+
+                // Dynamic season totals up to selected week (weekIdx + 1)
+                seasonPts = sumArrayRange(team.weekly_points, 0, weekIdx + 1).toFixed(2);
+                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, weekIdx + 1).toFixed(2);
+            }
+
+            // Render Table View
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${team.name}</strong></td>
+                <td>${ownerName}</td>
+                <td style="color: var(--accent); font-weight: bold;">${pts}</td>
+                <td>${optPts}</td>
+                <td>${benchPts}</td>
+                <td>${eff}%</td>
+                <td style="color: var(--accent); font-weight: bold;">${seasonPts}</td>
+                <td>${seasonOpt}</td>
+            `;
+            tableBody.appendChild(tr);
 
             // Render Card View
             const card = document.createElement('div');
@@ -302,21 +356,17 @@
                         <span class="stat-label">Efficiency</span>
                         <span class="stat-value">${eff}%</span>
                     </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Season Total</span>
+                        <span class="stat-value" style="color: var(--accent)">${seasonPts}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Season Opt</span>
+                        <span class="stat-value">${seasonOpt}</span>
+                    </div>
                 </div>
             `;
             cardsContainer.appendChild(card);
-
-            // Render Table View
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${team.name}</strong></td>
-                <td>${ownerName}</td>
-                <td style="color: var(--accent); font-weight: bold;">${pts}</td>
-                <td>${optPts}</td>
-                <td>${benchPts}</td>
-                <td>${eff}%</td>
-            `;
-            tableBody.appendChild(tr);
         });
     }
 
