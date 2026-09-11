@@ -225,6 +225,9 @@
 <script>
     let leagueData = null;
 
+    // Lightweight SVG placeholder to avoid network calls on missing logos
+    const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="12" font-family="sans-serif">LOGO</text></svg>';
+
     // Fetch JSON automatically on page load
     window.addEventListener('DOMContentLoaded', () => {
         fetch('./league_data.json')
@@ -351,7 +354,7 @@
                 benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
                 eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
 
-                // Check if the current week number is listed in the team's bye_weeks array
+                // Check if current week is in the team's bye_weeks array
                 if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
                     isByeWeek = true;
                 }
@@ -382,7 +385,10 @@
             card.className = 'team-card';
             card.innerHTML = `
                 <div class="team-header">
-                    <img class="team-logo" src="${team.logo || ''}" alt="${team.name}" onerror="this.src='https://via.placeholder.com/48'">
+                    <img class="team-logo" 
+                         src="${team.logo || PLACEHOLDER_LOGO}" 
+                         alt="${team.name}" 
+                         onerror="this.onerror=null; this.src='${PLACEHOLDER_LOGO}';">
                     <div class="team-info">
                         <h3>${team.name}${byeTagHTML}</h3>
                         <span class="team-owner">${ownerName} (${team.wins}-${team.losses})</span>
