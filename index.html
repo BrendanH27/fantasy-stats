@@ -240,6 +240,14 @@
         const weekSelect = document.getElementById('week-select');
         weekSelect.innerHTML = '';
 
+        // Add Season Totals option first so it is default
+        const seasonOpt = document.createElement('option');
+        seasonOpt.value = 'season_totals';
+        seasonOpt.textContent = totalWeeks > 1 
+            ? `Season Totals (Weeks 1–${totalWeeks})` 
+            : `Season Totals`;
+        weekSelect.appendChild(seasonOpt);
+
         // Add regular weekly options
         for (let i = 1; i <= totalWeeks; i++) {
             const opt = document.createElement('option');
@@ -256,17 +264,11 @@
             weekSelect.appendChild(post14Opt);
         }
 
-        // Add Season Totals option at the very end
-        const seasonOpt = document.createElement('option');
-        seasonOpt.value = 'season_totals';
-        seasonOpt.textContent = `Season Totals (Weeks 1–${totalWeeks})`;
-        weekSelect.appendChild(seasonOpt);
-
         // Show Dashboard
         document.getElementById('dashboard').classList.remove('hidden');
 
-        // Render initial view (Week 1)
-        renderData(0);
+        // Render initial view as Season Totals by default
+        renderData('season_totals');
 
         // Attach Event Listeners
         weekSelect.onchange = (e) => {
@@ -314,7 +316,7 @@
                 benchPts = sumArrayRange(team.weekly_bench_points, 14, totalWeeks).toFixed(2);
                 eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
 
-                // Total season cumulative up through the available weeks
+                // Total season cumulative up through available weeks
                 seasonPts = sumArrayRange(team.weekly_points, 0, totalWeeks).toFixed(2);
                 seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, totalWeeks).toFixed(2);
             } else {
