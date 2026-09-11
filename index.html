@@ -256,6 +256,12 @@
             weekSelect.appendChild(post14Opt);
         }
 
+        // Add Season Totals option at the very end
+        const seasonOpt = document.createElement('option');
+        seasonOpt.value = 'season_totals';
+        seasonOpt.textContent = `Season Totals (Weeks 1–${totalWeeks})`;
+        weekSelect.appendChild(seasonOpt);
+
         // Show Dashboard
         document.getElementById('dashboard').classList.remove('hidden');
 
@@ -265,7 +271,7 @@
         // Attach Event Listeners
         weekSelect.onchange = (e) => {
             const val = e.target.value;
-            renderData(val === 'post14' ? 'post14' : parseInt(val));
+            renderData(val === 'post14' || val === 'season_totals' ? val : parseInt(val));
         };
         document.getElementById('view-select').onchange = toggleView;
     }
@@ -290,7 +296,17 @@
 
             let pts, optPts, benchPts, eff, seasonPts, seasonOpt;
 
-            if (selection === 'post14') {
+            if (selection === 'season_totals') {
+                // Full Season aggregate calculations
+                const totalWeeks = team.weekly_points.length;
+                pts = sumArrayRange(team.weekly_points, 0, totalWeeks).toFixed(2);
+                optPts = sumArrayRange(team.weekly_optimal_points, 0, totalWeeks).toFixed(2);
+                benchPts = sumArrayRange(team.weekly_bench_points, 0, totalWeeks).toFixed(2);
+                eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
+
+                seasonPts = pts;
+                seasonOpt = optPts;
+            } else if (selection === 'post14') {
                 // Post Week 14 aggregate calculations
                 const totalWeeks = team.weekly_points.length;
                 pts = sumArrayRange(team.weekly_points, 14, totalWeeks).toFixed(2);
