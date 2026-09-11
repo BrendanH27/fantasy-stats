@@ -12,6 +12,8 @@
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
             --border: #334155;
+            --badge-bg: #f59e0b;
+            --badge-text: #0f172a;
         }
 
         body {
@@ -99,9 +101,13 @@
         .team-info h3 {
             margin: 0;
             font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .team-info span {
+        .team-info span.team-owner {
             font-size: 0.85rem;
             color: var(--text-sub);
         }
@@ -129,6 +135,21 @@
         .stat-value {
             font-size: 1.1rem;
             font-weight: bold;
+        }
+
+        /* Bye Badge Styling */
+        .bye-badge {
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.35rem;
         }
 
         /* Table View */
@@ -297,6 +318,7 @@
                 : 'Unknown';
 
             let pts, optPts, benchPts, eff, seasonPts, seasonOpt;
+            let isByeWeek = false;
 
             if (selection === 'season_totals') {
                 // Full Season aggregate calculations
@@ -322,20 +344,29 @@
             } else {
                 // Single-week view with dynamic cumulative calculations up to selected week
                 const weekIdx = selection;
+                const currentWeekNum = weekIdx + 1; // 1-indexed week number
+
                 pts = team.weekly_points[weekIdx]?.toFixed(2) || '0.00';
                 optPts = team.weekly_optimal_points[weekIdx]?.toFixed(2) || '0.00';
                 benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
                 eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
+
+                // Check if the current week number is listed in the team's bye_weeks array
+                if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
+                    isByeWeek = true;
+                }
 
                 // Dynamic season totals up to selected week (weekIdx + 1)
                 seasonPts = sumArrayRange(team.weekly_points, 0, weekIdx + 1).toFixed(2);
                 seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, weekIdx + 1).toFixed(2);
             }
 
+            const byeTagHTML = isByeWeek ? `<span class="bye-badge">BYE WEEK</span>` : '';
+
             // Render Table View
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${team.name}</strong></td>
+                <td><strong>${team.name}</strong>${byeTagHTML}</td>
                 <td>${ownerName}</td>
                 <td style="color: var(--accent); font-weight: bold;">${pts}</td>
                 <td>${optPts}</td>
@@ -353,8 +384,8 @@
                 <div class="team-header">
                     <img class="team-logo" src="${team.logo || ''}" alt="${team.name}" onerror="this.src='https://via.placeholder.com/48'">
                     <div class="team-info">
-                        <h3>${team.name}</h3>
-                        <span>${ownerName} (${team.wins}-${team.losses})</span>
+                        <h3>${team.name}${byeTagHTML}</h3>
+                        <span class="team-owner">${ownerName} (${team.wins}-${team.losses})</span>
                     </div>
                 </div>
                 <div class="stat-grid">
