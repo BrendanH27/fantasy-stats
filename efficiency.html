@@ -39,19 +39,13 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Controls */
         .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
             gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .control-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
             flex-wrap: wrap;
         }
 
@@ -65,6 +59,7 @@
             outline: none;
         }
 
+        /* Loading / Error state */
         #status-message {
             text-align: center;
             font-size: 1.2rem;
@@ -72,6 +67,7 @@
             margin-top: 3rem;
         }
 
+        /* Cards Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -141,6 +137,7 @@
             font-weight: bold;
         }
 
+        /* Bye Badge Styling */
         .bye-badge {
             background-color: var(--badge-bg);
             color: var(--badge-text);
@@ -155,6 +152,7 @@
             margin-left: 0.35rem;
         }
 
+        /* Table View */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -189,15 +187,9 @@
 
     <div id="dashboard" class="hidden">
         <div class="controls">
-            <div class="control-group">
-                <div>
-                    <label for="year-select">Year: </label>
-                    <select id="year-select"></select>
-                </div>
-                <div>
-                    <label for="week-select">View Segment: </label>
-                    <select id="week-select"></select>
-                </div>
+            <div>
+                <label for="week-select">View Segment: </label>
+                <select id="week-select"></select>
             </div>
             <div>
                 <label for="view-select">View Style: </label>
@@ -231,21 +223,23 @@
 </div>
 
 <script>
-    let rawLeagueData = null;
-    let selectedYear = null;
-    let currentYearData = null;
+    let leagueData = null;
 
+    // Lightweight SVG placeholder to avoid network calls on missing logos
     const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="12" font-family="sans-serif">LOGO</text></svg>';
 
+    // Fetch JSON automatically on page load
     window.addEventListener('DOMContentLoaded', () => {
         fetch('./league_data.json')
             .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 return response.json();
             })
             .then(data => {
-                rawLeagueData = data;
-                initYearSelect();
+                leagueData = data;
+                initDashboard();
             })
             .catch(error => {
                 console.error("Error loading JSON:", error);
@@ -254,80 +248,53 @@
             });
     });
 
-    function initYearSelect() {
-        if (!rawLeagueData) return;
+    function initDashboard() {
+        if (!leagueData) return;
 
-        // Support single year object or multi-year object structure
-        const years = rawLeagueData.year ? [rawLeagueData.year.toString()] : Object.keys(rawLeagueData).sort((a, b) => b - a);
-
-        const yearSelect = document.getElementById('year-select');
-        yearSelect.innerHTML = '';
-
-        years.forEach(year => {
-            const opt = document.createElement('option');
-            opt.value = year;
-            opt.textContent = year;
-            yearSelect.appendChild(opt);
-        });
-
-        yearSelect.onchange = (e) => loadYear(e.target.value);
-
-        // Auto-select most recent year
-        selectedYear = years[0];
-        loadYear(selectedYear);
-    }
-
-    function loadYear(year) {
-        selectedYear = year;
-        currentYearData = rawLeagueData.year ? rawLeagueData : rawLeagueData[year];
-        if (!currentYearData) return;
-
+        // Hide status message
         document.getElementById('status-message').classList.add('hidden');
-        document.getElementById('league-title').textContent = currentYearData.league_name || `Fantasy League (${year})`;
 
-        buildWeekDropdown();
-        document.getElementById('dashboard').classList.remove('hidden');
+        // Set League Title
+        document.getElementById('league-title').textContent = leagueData.league_name || "Fantasy League";
 
-        // Reset to regular season view on year switch
-        renderData('regular_season_totals');
-    }
-
-    function buildWeekDropdown() {
-        const teams = Object.values(currentYearData.teams || {});
+        const teams = Object.values(leagueData.teams);
         if (teams.length === 0) return;
 
-        const maxWeeks = Math.max(...teams.map(t => (t.weekly_points || []).length), 0);
+        const totalWeeks = teams[0].weekly_points.length;
         const weekSelect = document.getElementById('week-select');
         weekSelect.innerHTML = '';
 
-        if (maxWeeks === 0) {
-            const emptyOpt = document.createElement('option');
-            emptyOpt.value = 'regular_season_totals';
-            emptyOpt.textContent = 'No Games Played Yet';
-            weekSelect.appendChild(emptyOpt);
-            return;
-        }
+        const regSeasonEndWeek = Math.min(14, totalWeeks);
 
-        const regSeasonEndWeek = Math.min(14, maxWeeks);
+        // Regular Season Totals Option (Default)
         const seasonOpt = document.createElement('option');
         seasonOpt.value = 'regular_season_totals';
         seasonOpt.textContent = `Regular Season Totals (Weeks 1–${regSeasonEndWeek})`;
         weekSelect.appendChild(seasonOpt);
 
-        for (let i = 1; i <= maxWeeks; i++) {
+        // Add standard weekly options (Week 1 through total available weeks)
+        for (let i = 1; i <= totalWeeks; i++) {
             const opt = document.createElement('option');
-            opt.value = i - 1;
+            opt.value = i - 1; // 0-indexed internally
             opt.textContent = `Week ${i}`;
             weekSelect.appendChild(opt);
         }
 
-        if (maxWeeks > 14) {
+        // Add Playoffs Aggregate option if dataset extends past week 14
+        if (totalWeeks > 14) {
             const post14Opt = document.createElement('option');
             post14Opt.value = 'post14';
-            post14Opt.textContent = `Playoffs Aggregate (Weeks 15–${maxWeeks})`;
+            post14Opt.textContent = `Playoffs Aggregate (Weeks 15–${totalWeeks})`;
             weekSelect.appendChild(post14Opt);
         }
 
+        // Show Dashboard
+        document.getElementById('dashboard').classList.remove('hidden');
+
+        // Render initial view as Regular Season Totals by default
+        renderData('regular_season_totals');
+
+        // Attach Event Listeners
         weekSelect.onchange = (e) => {
             const val = e.target.value;
             renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
@@ -336,12 +303,12 @@
     }
 
     function sumArrayRange(arr, start, end) {
-        if (!arr || !arr.length) return 0;
+        if (!arr) return 0;
         return arr.slice(start, end).reduce((sum, val) => sum + (val || 0), 0);
     }
 
     function renderData(selection) {
-        const teams = Object.values(currentYearData.teams || {});
+        const teams = Object.values(leagueData.teams);
         const cardsContainer = document.getElementById('cards-view');
         const tableBody = document.getElementById('table-body');
 
@@ -353,52 +320,54 @@
                 ? `${team.owner[0].firstName} ${team.owner[0].lastName}` 
                 : 'Unknown';
 
-            const weeklyPoints = team.weekly_points || [];
-            const weeklyOptPoints = team.weekly_optimal_points || [];
-            const weeklyBenchPoints = team.weekly_bench_points || [];
-            const weeklyEfficiency = team.weekly_efficiency || [];
-
             let pts, optPts, benchPts, eff, seasonPts, seasonOpt;
             let isByeWeek = false;
 
             if (selection === 'regular_season_totals') {
-                const regSeasonLimit = Math.min(14, weeklyPoints.length);
-                pts = sumArrayRange(weeklyPoints, 0, regSeasonLimit).toFixed(2);
-                optPts = sumArrayRange(weeklyOptPoints, 0, regSeasonLimit).toFixed(2);
-                benchPts = sumArrayRange(weeklyBenchPoints, 0, regSeasonLimit).toFixed(2);
+                // Regular Season aggregate calculations (Weeks 1–14 max)
+                const regSeasonLimit = Math.min(14, team.weekly_points.length);
+                pts = sumArrayRange(team.weekly_points, 0, regSeasonLimit).toFixed(2);
+                optPts = sumArrayRange(team.weekly_optimal_points, 0, regSeasonLimit).toFixed(2);
+                benchPts = sumArrayRange(team.weekly_bench_points, 0, regSeasonLimit).toFixed(2);
                 eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
 
                 seasonPts = pts;
                 seasonOpt = optPts;
             } else if (selection === 'post14') {
-                const totalWeeks = weeklyPoints.length;
-                pts = sumArrayRange(weeklyPoints, 14, totalWeeks).toFixed(2);
-                optPts = sumArrayRange(weeklyOptPoints, 14, totalWeeks).toFixed(2);
-                benchPts = sumArrayRange(weeklyBenchPoints, 14, totalWeeks).toFixed(2);
+                // Post Week 14 aggregate calculations
+                const totalWeeks = team.weekly_points.length;
+                pts = sumArrayRange(team.weekly_points, 14, totalWeeks).toFixed(2);
+                optPts = sumArrayRange(team.weekly_optimal_points, 14, totalWeeks).toFixed(2);
+                benchPts = sumArrayRange(team.weekly_bench_points, 14, totalWeeks).toFixed(2);
                 eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
 
+                // Regular season aggregate for comparison column
                 const regSeasonLimit = Math.min(14, totalWeeks);
-                seasonPts = sumArrayRange(weeklyPoints, 0, regSeasonLimit).toFixed(2);
-                seasonOpt = sumArrayRange(weeklyOptPoints, 0, regSeasonLimit).toFixed(2);
+                seasonPts = sumArrayRange(team.weekly_points, 0, regSeasonLimit).toFixed(2);
+                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, regSeasonLimit).toFixed(2);
             } else {
+                // Single-week view with dynamic cumulative calculations up to selected week
                 const weekIdx = selection;
-                const currentWeekNum = weekIdx + 1;
+                const currentWeekNum = weekIdx + 1; // 1-indexed week number
 
-                pts = weeklyPoints[weekIdx]?.toFixed(2) || '0.00';
-                optPts = weeklyOptPoints[weekIdx]?.toFixed(2) || '0.00';
-                benchPts = weeklyBenchPoints[weekIdx]?.toFixed(2) || '0.00';
-                eff = weeklyEfficiency[weekIdx]?.toFixed(1) || '0.0';
+                pts = team.weekly_points[weekIdx]?.toFixed(2) || '0.00';
+                optPts = team.weekly_optimal_points[weekIdx]?.toFixed(2) || '0.00';
+                benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
+                eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
 
+                // Check if current week is in the team's bye_weeks array
                 if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
                     isByeWeek = true;
                 }
 
-                seasonPts = sumArrayRange(weeklyPoints, 0, weekIdx + 1).toFixed(2);
-                seasonOpt = sumArrayRange(weeklyOptPoints, 0, weekIdx + 1).toFixed(2);
+                // Cumulative total up to selected week
+                seasonPts = sumArrayRange(team.weekly_points, 0, weekIdx + 1).toFixed(2);
+                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, weekIdx + 1).toFixed(2);
             }
 
             const byeTagHTML = isByeWeek ? `<span class="bye-badge">BYE WEEK</span>` : '';
 
+            // Render Table View
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${team.name}</strong>${byeTagHTML}</td>
@@ -412,6 +381,7 @@
             `;
             tableBody.appendChild(tr);
 
+            // Render Card View
             const card = document.createElement('div');
             card.className = 'team-card';
             card.innerHTML = `
@@ -422,7 +392,7 @@
                          onerror="this.onerror=null; this.src='${PLACEHOLDER_LOGO}';">
                     <div class="team-info">
                         <h3>${team.name}${byeTagHTML}</h3>
-                        <span class="team-owner">${ownerName} (${team.wins ?? 0}-${team.losses ?? 0})</span>
+                        <span class="team-owner">${ownerName} (${team.wins}-${team.losses})</span>
                     </div>
                 </div>
                 <div class="stat-grid">
