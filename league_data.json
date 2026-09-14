@@ -1,4 +1,5 @@
 {
+    "2025": {
     "league_name": "Gordon Heights x Weenie Hut 2025",
     "teams": {
         "1": {
@@ -2136,5 +2137,6 @@
             "bye_weeks": [],
             "total_efficiency": 85.8
         }
+    }
     }
 }
