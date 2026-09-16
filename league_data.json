@@ -179,6 +179,165 @@
                 15,
                 17
             ],
+            "espn_power_ranking": [
+                "17.50",
+                "18.75",
+                "17.55",
+                "21.65",
+                "19.75",
+                "19.50",
+                "17.90",
+                "18.80",
+                "18.65",
+                "19.50",
+                "20.60",
+                "24.90",
+                "26.05",
+                "26.50",
+                "28.20",
+                "29.75",
+                "31.90"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                }
+            ],
             "total_efficiency": 85.6
         },
         "2": {
@@ -356,6 +515,165 @@
                 94.4
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "16.30",
+                "14.25",
+                "14.75",
+                "14.75",
+                "14.85",
+                "15.45",
+                "15.05",
+                "15.20",
+                "20.35",
+                "27.85",
+                "33.20",
+                "34.70",
+                "42.45",
+                "44.30",
+                "50.15",
+                "57.95",
+                "66.65"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                }
+            ],
             "total_efficiency": 87.6
         },
         "3": {
@@ -534,6 +852,165 @@
             ],
             "bye_weeks": [
                 16
+            ],
+            "espn_power_ranking": [
+                "14.70",
+                "18.90",
+                "18.00",
+                "17.80",
+                "21.25",
+                "27.70",
+                "33.20",
+                "37.65",
+                "42.10",
+                "43.65",
+                "45.10",
+                "46.35",
+                "54.95",
+                "65.10",
+                "68.05",
+                "70.45",
+                "71.95"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                }
             ],
             "total_efficiency": 90.4
         },
@@ -714,6 +1191,165 @@
             "bye_weeks": [
                 15
             ],
+            "espn_power_ranking": [
+                "25.00",
+                "26.20",
+                "29.80",
+                "34.70",
+                "39.15",
+                "44.70",
+                "46.95",
+                "48.30",
+                "55.10",
+                "58.95",
+                "67.30",
+                "70.50",
+                "77.10",
+                "83.70",
+                "86.50",
+                "97.50",
+                "111.10"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                }
+            ],
             "total_efficiency": 88.2
         },
         "5": {
@@ -891,6 +1527,165 @@
                 95.2
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "22.65",
+                "25.05",
+                "24.30",
+                "25.55",
+                "28.50",
+                "32.75",
+                "33.15",
+                "38.55",
+                "38.70",
+                "47.95",
+                "48.15",
+                "50.35",
+                "51.25",
+                "62.70",
+                "73.10",
+                "74.85",
+                "77.80"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                }
+            ],
             "total_efficiency": 87.6
         },
         "6": {
@@ -1068,6 +1863,165 @@
                 80.6
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "18.15",
+                "17.45",
+                "17.55",
+                "21.35",
+                "25.95",
+                "26.60",
+                "29.80",
+                "32.05",
+                "33.35",
+                "36.70",
+                "36.75",
+                "46.90",
+                "48.10",
+                "57.45",
+                "64.75",
+                "66.30",
+                "68.15"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                }
+            ],
             "total_efficiency": 89.4
         },
         "7": {
@@ -1245,6 +2199,165 @@
                 96.9
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "20.55",
+                "27.80",
+                "30.25",
+                "29.80",
+                "31.55",
+                "34.15",
+                "39.00",
+                "44.05",
+                "47.50",
+                "50.20",
+                "58.85",
+                "66.95",
+                "69.90",
+                "74.10",
+                "82.90",
+                "91.85",
+                "93.20"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                }
+            ],
             "total_efficiency": 91.1
         },
         "8": {
@@ -1422,6 +2535,165 @@
                 96.9
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "21.35",
+                "17.95",
+                "21.55",
+                "25.00",
+                "24.85",
+                "27.10",
+                "31.75",
+                "30.95",
+                "31.80",
+                "41.85",
+                "46.95",
+                "56.25",
+                "66.50",
+                "69.75",
+                "81.55",
+                "84.55",
+                "94.35"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                }
+            ],
             "total_efficiency": 86.7
         },
         "9": {
@@ -1600,6 +2872,165 @@
             ],
             "bye_weeks": [
                 16
+            ],
+            "espn_power_ranking": [
+                "29.00",
+                "23.10",
+                "21.65",
+                "20.75",
+                "21.05",
+                "20.80",
+                "21.85",
+                "23.30",
+                "24.65",
+                "24.70",
+                "25.25",
+                "30.30",
+                "32.60",
+                "34.15",
+                "34.80",
+                "35.50",
+                "42.85"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                }
             ],
             "total_efficiency": 87.6
         },
@@ -1780,6 +3211,165 @@
             "bye_weeks": [
                 17
             ],
+            "espn_power_ranking": [
+                "23.45",
+                "24.20",
+                "24.20",
+                "28.30",
+                "33.15",
+                "32.25",
+                "38.65",
+                "46.85",
+                "51.85",
+                "55.45",
+                "59.00",
+                "62.70",
+                "65.90",
+                "71.90",
+                "73.90",
+                "76.85",
+                "80.55"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                }
+            ],
             "total_efficiency": 88.6
         },
         "11": {
@@ -1957,6 +3547,165 @@
                 98.3
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "14.20",
+                "19.40",
+                "24.55",
+                "29.40",
+                "28.20",
+                "31.00",
+                "32.05",
+                "39.15",
+                "44.90",
+                "52.90",
+                "58.15",
+                "69.25",
+                "76.90",
+                "79.85",
+                "83.00",
+                "94.65",
+                "105.25"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 10,
+                    "losses": 1
+                },
+                {
+                    "wins": 11,
+                    "losses": 0
+                },
+                {
+                    "wins": 9,
+                    "losses": 2
+                }
+            ],
             "total_efficiency": 91.2
         },
         "12": {
@@ -2134,6 +3883,165 @@
                 63.9
             ],
             "bye_weeks": [],
+            "espn_power_ranking": [
+                "19.10",
+                "20.05",
+                "20.30",
+                "21.25",
+                "26.20",
+                "24.70",
+                "25.70",
+                "25.65",
+                "26.10",
+                "30.55",
+                "37.05",
+                "39.60",
+                "45.50",
+                "51.85",
+                "55.45",
+                "60.15",
+                "61.85"
+            ],
+            "true_record_per_week": [
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 0,
+                    "losses": 11
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                }
+            ],
+            "optimal_true_record_per_week": [
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 6,
+                    "losses": 5
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                },
+                {
+                    "wins": 3,
+                    "losses": 8
+                },
+                {
+                    "wins": 5,
+                    "losses": 6
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 8,
+                    "losses": 3
+                },
+                {
+                    "wins": 2,
+                    "losses": 9
+                },
+                {
+                    "wins": 1,
+                    "losses": 10
+                },
+                {
+                    "wins": 7,
+                    "losses": 4
+                },
+                {
+                    "wins": 4,
+                    "losses": 7
+                }
+            ],
             "total_efficiency": 85.8
         }
     }
