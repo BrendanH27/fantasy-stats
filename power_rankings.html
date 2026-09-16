@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy League - Power Rankings</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --badge-bg: #f59e0b;
+            --badge-text: #0f172a;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        select {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* Loading / Error state */
+        #status-message {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            margin-top: 3rem;
+        }
+
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .team-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .team-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--border);
+        }
+
+        .team-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .team-info span.team-owner {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Bye Badge Styling */
+        .bye-badge {
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.35rem;
+        }
+
+        /* Table View */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(0,0,0,0.3);
+            color: var(--accent);
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="league-title">Loading Power Rankings...</h1>
+    </header>
+
+    <div id="status-message">Fetching data from GitHub...</div>
+
+    <div id="dashboard" class="hidden">
+        <div class="controls">
+            <div class="control-group">
+                <div>
+                    <label for="week-select">View Segment: </label>
+                    <select id="week-select"></select>
+                </div>
+                <div>
+                    <label for="sort-select">Sort By: </label>
+                    <select id="sort-select">
+                        <option value="power" selected>Power Ranking Rating</option>
+                        <option value="trueRecord">True Record Wins</option>
+                        <option value="optRecord">Optimal Record Wins</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="view-select">View Style: </label>
+                <select id="view-select">
+                    <option value="table" selected>Table</option>
+                    <option value="cards">Cards</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="table-view">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th>Owner</th>
+                        <th>Power Ranking Score</th>
+                        <th>True Record</th>
+                        <th>True Win %</th>
+                        <th>Optimal True Record</th>
+                        <th>Opt Win %</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+        
+        <div id="cards-view" class="grid hidden"></div>
+    </div>
+</div>
+
+<script>
+    let leagueData = null;
+
+    const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="12" font-family="sans-serif">LOGO</text></svg>';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch('./league_data.json')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                leagueData = data;
+                initDashboard();
+            })
+            .catch(error => {
+                console.error("Error loading JSON:", error);
+                document.getElementById('status-message').textContent = 
+                    "Failed to load 'league_data.json'. Make sure the file exists in the repository root.";
+            });
+    });
+
+    function initDashboard() {
+        if (!leagueData) return;
+
+        document.getElementById('status-message').classList.add('hidden');
+        document.getElementById('league-title').textContent = (leagueData.league_name || "Fantasy League") + " - Power Rankings";
+
+        const teams = Object.values(leagueData.teams);
+        if (teams.length === 0) return;
+
+        const totalWeeks = teams[0].weekly_points.length;
+        const weekSelect = document.getElementById('week-select');
+        weekSelect.innerHTML = '';
+
+        const regSeasonEndWeek = Math.min(14, totalWeeks);
+
+        const seasonOpt = document.createElement('option');
+        seasonOpt.value = 'regular_season_totals';
+        seasonOpt.textContent = `Regular Season Cumulatives (Weeks 1–${regSeasonEndWeek})`;
+        weekSelect.appendChild(seasonOpt);
+
+        for (let i = 1; i <= totalWeeks; i++) {
+            const opt = document.createElement('option');
+            opt.value = i - 1;
+            opt.textContent = `Week ${i}`;
+            weekSelect.appendChild(opt);
+        }
+
+        if (totalWeeks > 14) {
+            const post14Opt = document.createElement('option');
+            post14Opt.value = 'post14';
+            post14Opt.textContent = `Playoffs Aggregate (Weeks 15–${totalWeeks})`;
+            weekSelect.appendChild(post14Opt);
+        }
+
+        document.getElementById('dashboard').classList.remove('hidden');
+
+        renderData('regular_season_totals');
+
+        weekSelect.onchange = (e) => {
+            const val = e.target.value;
+            renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
+        };
+        document.getElementById('sort-select').onchange = () => {
+            const val = weekSelect.value;
+            renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
+        };
+        document.getElementById('view-select').onchange = toggleView;
+    }
+
+    function sumRecordRange(recordsArray, start, end) {
+        if (!recordsArray) return { wins: 0, losses: 0 };
+        return recordsArray.slice(start, end).reduce((acc, curr) => {
+            acc.wins += curr?.wins || 0;
+            acc.losses += curr?.losses || 0;
+            return acc;
+        }, { wins: 0, losses: 0 });
+    }
+
+    function renderData(selection) {
+        const teams = Object.values(leagueData.teams);
+        const cardsContainer = document.getElementById('cards-view');
+        const tableBody = document.getElementById('table-body');
+        const sortCriteria = document.getElementById('sort-select').value;
+
+        cardsContainer.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        const processedTeams = teams.map(team => {
+            const ownerName = team.owner?.[0] 
+                ? `${team.owner[0].firstName} ${team.owner[0].lastName}` 
+                : 'Unknown';
+
+            let powerScore, trueWins, trueLosses, optWins, optLosses;
+            let isByeWeek = false;
+
+            if (selection === 'regular_season_totals') {
+                const limit = Math.min(14, team.weekly_points.length);
+                
+                // Latest power ranking score available in regular season range
+                powerScore = parseFloat(team.espn_power_ranking[limit - 1] || 0);
+
+                const tRec = sumRecordRange(team.true_record_per_week, 0, limit);
+                trueWins = tRec.wins;
+                trueLosses = tRec.losses;
+
+                const oRec = sumRecordRange(team.optimal_true_record_per_week, 0, limit);
+                optWins = oRec.wins;
+                optLosses = oRec.losses;
+            } else if (selection === 'post14') {
+                const totalWeeks = team.weekly_points.length;
+
+                powerScore = parseFloat(team.espn_power_ranking[totalWeeks - 1] || 0);
+
+                const tRec = sumRecordRange(team.true_record_per_week, 14, totalWeeks);
+                trueWins = tRec.wins;
+                trueLosses = tRec.losses;
+
+                const oRec = sumRecordRange(team.optimal_true_record_per_week, 14, totalWeeks);
+                optWins = oRec.wins;
+                optLosses = oRec.losses;
+            } else {
+                const weekIdx = selection;
+                const currentWeekNum = weekIdx + 1;
+
+                powerScore = parseFloat(team.espn_power_ranking[weekIdx] || 0);
+
+                // Cumulative record up to selected week
+                const tRec = sumRecordRange(team.true_record_per_week, 0, weekIdx + 1);
+                trueWins = tRec.wins;
+                trueLosses = tRec.losses;
+
+                const oRec = sumRecordRange(team.optimal_true_record_per_week, 0, weekIdx + 1);
+                optWins = oRec.wins;
+                optLosses = oRec.losses;
+
+                if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
+                    isByeWeek = true;
+                }
+            }
+
+            const trueGames = trueWins + trueLosses;
+            const truePct = trueGames > 0 ? ((trueWins / trueGames) * 100).toFixed(1) : '0.0';
+
+            const optGames = optWins + optLosses;
+            const optPct = optGames > 0 ? ((optWins / optGames) * 100).toFixed(1) : '0.0';
+
+            return {
+                rawTeam: team,
+                ownerName,
+                isByeWeek,
+                powerScore,
+                trueWins,
+                trueLosses,
+                truePct,
+                optWins,
+                optLosses,
+                optPct
+            };
+        });
+
+        // Sorting Logic based on user selection
+        processedTeams.sort((a, b) => {
+            if (sortCriteria === 'power') {
+                return b.powerScore - a.powerScore;
+            } else if (sortCriteria === 'trueRecord') {
+                return (b.trueWins - a.trueWins) || (parseFloat(b.truePct) - parseFloat(a.truePct));
+            } else if (sortCriteria === 'optRecord') {
+                return (b.optWins - a.optWins) || (parseFloat(b.optPct) - parseFloat(a.optPct));
+            }
+            return 0;
+        });
+
+        // DOM Rendering
+        processedTeams.forEach(item => {
+            const team = item.rawTeam;
+            const byeTagHTML = item.isByeWeek ? `<span class="bye-badge">BYE WEEK</span>` : '';
+
+            // Table Row
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${team.name}</strong>${byeTagHTML}</td>
+                <td>${item.ownerName}</td>
+                <td style="color: var(--accent); font-weight: bold;">${item.powerScore.toFixed(2)}</td>
+                <td>${item.trueWins}-${item.trueLosses}</td>
+                <td>${item.truePct}%</td>
+                <td>${item.optWins}-${item.optLosses}</td>
+                <td>${item.optPct}%</td>
+            `;
+            tableBody.appendChild(tr);
+
+            // Card Item
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            card.innerHTML = `
+                <div class="team-header">
+                    <img class="team-logo" 
+                         src="${team.logo || PLACEHOLDER_LOGO}" 
+                         alt="${team.name}" 
+                         onerror="this.onerror=null; this.src='${PLACEHOLDER_LOGO}';">
+                    <div class="team-info">
+                        <h3>${team.name}${byeTagHTML}</h3>
+                        <span class="team-owner">${item.ownerName} (${team.wins}-${team.losses})</span>
+                    </div>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Power Score</span>
+                        <span class="stat-value" style="color: var(--accent)">${item.powerScore.toFixed(2)}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">True Record</span>
+                        <span class="stat-value">${item.trueWins}-${item.trueLosses}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">True Win %</span>
+                        <span class="stat-value">${item.truePct}%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Opt Record</span>
+                        <span class="stat-value">${item.optWins}-${item.optLosses}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Opt Win %</span>
+                        <span class="stat-value">${item.optPct}%</span>
+                    </div>
+                </div>
+            `;
+            cardsContainer.appendChild(card);
+        });
+    }
+
+    function toggleView(e) {
+        const view = e.target.value;
+        if (view === 'cards') {
+            document.getElementById('cards-view').classList.remove('hidden');
+            document.getElementById('table-view').classList.add('hidden');
+        } else {
+            document.getElementById('cards-view').classList.add('hidden');
+            document.getElementById('table-view').classList.remove('hidden');
+        }
+    }
+</script>
+
+</body>
+</html>
