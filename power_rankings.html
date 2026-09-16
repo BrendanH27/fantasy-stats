@@ -76,7 +76,7 @@
         /* Cards Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
         }
 
@@ -202,8 +202,8 @@
                     <label for="sort-select">Sort By: </label>
                     <select id="sort-select">
                         <option value="power" selected>Power Ranking Rating</option>
-                        <option value="trueRecord">True Record Wins</option>
-                        <option value="optRecord">Optimal Record Wins</option>
+                        <option value="trueRecord">True Record Wins (Cum.)</option>
+                        <option value="optRecord">Optimal Record Wins (Cum.)</option>
                     </select>
                 </div>
             </div>
@@ -222,11 +222,11 @@
                     <tr>
                         <th>Team</th>
                         <th>Owner</th>
-                        <th>Power Ranking Score</th>
-                        <th>True Record</th>
-                        <th>True Win %</th>
-                        <th>Optimal True Record</th>
-                        <th>Opt Win %</th>
+                        <th>Power Score</th>
+                        <th>Segment True Rec</th>
+                        <th>Cumulative True Rec</th>
+                        <th>Segment Opt Rec</th>
+                        <th>Cumulative Opt Rec</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -331,82 +331,77 @@
                 ? `${team.owner[0].firstName} ${team.owner[0].lastName}` 
                 : 'Unknown';
 
-            let powerScore, trueWins, trueLosses, optWins, optLosses;
+            let powerScore;
+            let segmentTrue = { wins: 0, losses: 0 };
+            let cumTrue = { wins: 0, losses: 0 };
+            let segmentOpt = { wins: 0, losses: 0 };
+            let cumOpt = { wins: 0, losses: 0 };
             let isByeWeek = false;
 
             if (selection === 'regular_season_totals') {
                 const limit = Math.min(14, team.weekly_points.length);
-                
-                // Latest power ranking score available in regular season range
                 powerScore = parseFloat(team.espn_power_ranking[limit - 1] || 0);
 
-                const tRec = sumRecordRange(team.true_record_per_week, 0, limit);
-                trueWins = tRec.wins;
-                trueLosses = tRec.losses;
+                segmentTrue = sumRecordRange(team.true_record_per_week, 0, limit);
+                cumTrue = segmentTrue;
 
-                const oRec = sumRecordRange(team.optimal_true_record_per_week, 0, limit);
-                optWins = oRec.wins;
-                optLosses = oRec.losses;
+                segmentOpt = sumRecordRange(team.optimal_true_record_per_week, 0, limit);
+                cumOpt = segmentOpt;
             } else if (selection === 'post14') {
                 const totalWeeks = team.weekly_points.length;
-
                 powerScore = parseFloat(team.espn_power_ranking[totalWeeks - 1] || 0);
 
-                const tRec = sumRecordRange(team.true_record_per_week, 14, totalWeeks);
-                trueWins = tRec.wins;
-                trueLosses = tRec.losses;
+                segmentTrue = sumRecordRange(team.true_record_per_week, 14, totalWeeks);
+                cumTrue = sumRecordRange(team.true_record_per_week, 0, totalWeeks);
 
-                const oRec = sumRecordRange(team.optimal_true_record_per_week, 14, totalWeeks);
-                optWins = oRec.wins;
-                optLosses = oRec.losses;
+                segmentOpt = sumRecordRange(team.optimal_true_record_per_week, 14, totalWeeks);
+                cumOpt = sumRecordRange(team.optimal_true_record_per_week, 0, totalWeeks);
             } else {
                 const weekIdx = selection;
                 const currentWeekNum = weekIdx + 1;
-
                 powerScore = parseFloat(team.espn_power_ranking[weekIdx] || 0);
 
-                // Cumulative record up to selected week
-                const tRec = sumRecordRange(team.true_record_per_week, 0, weekIdx + 1);
-                trueWins = tRec.wins;
-                trueLosses = tRec.losses;
+                // Specific week wins & losses
+                segmentTrue = team.true_record_per_week[weekIdx] || { wins: 0, losses: 0 };
+                segmentOpt = team.optimal_true_record_per_week[weekIdx] || { wins: 0, losses: 0 };
 
-                const oRec = sumRecordRange(team.optimal_true_record_per_week, 0, weekIdx + 1);
-                optWins = oRec.wins;
-                optLosses = oRec.losses;
+                // Cumulative totals up to selected week
+                cumTrue = sumRecordRange(team.true_record_per_week, 0, weekIdx + 1);
+                cumOpt = sumRecordRange(team.optimal_true_record_per_week, 0, weekIdx + 1);
 
                 if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
                     isByeWeek = true;
                 }
             }
 
-            const trueGames = trueWins + trueLosses;
-            const truePct = trueGames > 0 ? ((trueWins / trueGames) * 100).toFixed(1) : '0.0';
+            const cumTrueGames = cumTrue.wins + cumTrue.losses;
+            const cumTruePct = cumTrueGames > 0 ? ((cumTrue.wins / cumTrueGames) * 100).toFixed(1) : '0.0';
 
-            const optGames = optWins + optLosses;
-            const optPct = optGames > 0 ? ((optWins / optGames) * 100).toFixed(1) : '0.0';
+            const cumOptGames = cumOpt.wins + cumOpt.losses;
+            const cumOptPct = cumOptGames > 0 ? ((cumOpt.wins / cumOptGames) * 100).toFixed(1) : '0.0';
 
             return {
                 rawTeam: team,
                 ownerName,
                 isByeWeek,
                 powerScore,
-                trueWins,
-                trueLosses,
-                truePct,
-                optWins,
-                optLosses,
-                optPct
+                segmentTrue,
+                cumTrue,
+                cumTruePct,
+                segmentOpt,
+                cumOpt,
+                cumOptPct
             };
         });
 
-        // Sorting Logic based on user selection
+        // Sorting Logic based on selection
         processedTeams.sort((a, b) => {
             if (sortCriteria === 'power') {
                 return b.powerScore - a.powerScore;
             } else if (sortCriteria === 'trueRecord') {
-                return (b.trueWins - a.trueWins) || (parseFloat(b.truePct) - parseFloat(a.truePct));
+                return (b.cumTrue.wins - a.cumTrue.wins) || (parseFloat(b.cumTruePct) - parseFloat(a.cumTruePct));
             } else if (sortCriteria === 'optRecord') {
-                return (b.optWins - a.optWins) || (parseFloat(b.optPct) - parseFloat(a.optPct));
+                return (b.cumOpt.wins - a.cumOpt.wins) || (parseFloat(b.cumOptPct) - parseFloat(a.cumOptPct));
             }
             return 0;
         });
@@ -422,10 +417,10 @@
                 <td><strong>${team.name}</strong>${byeTagHTML}</td>
                 <td>${item.ownerName}</td>
                 <td style="color: var(--accent); font-weight: bold;">${item.powerScore.toFixed(2)}</td>
-                <td>${item.trueWins}-${item.trueLosses}</td>
-                <td>${item.truePct}%</td>
-                <td>${item.optWins}-${item.optLosses}</td>
-                <td>${item.optPct}%</td>
+                <td>${item.segmentTrue.wins}-${item.segmentTrue.losses}</td>
+                <td>${item.cumTrue.wins}-${item.cumTrue.losses} (${item.cumTruePct}%)</td>
+                <td>${item.segmentOpt.wins}-${item.segmentOpt.losses}</td>
+                <td>${item.cumOpt.wins}-${item.cumOpt.losses} (${item.cumOptPct}%)</td>
             `;
             tableBody.appendChild(tr);
 
@@ -449,20 +444,24 @@
                         <span class="stat-value" style="color: var(--accent)">${item.powerScore.toFixed(2)}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">True Record</span>
-                        <span class="stat-value">${item.trueWins}-${item.trueLosses}</span>
+                        <span class="stat-label">Week True Rec</span>
+                        <span class="stat-value">${item.segmentTrue.wins}-${item.segmentTrue.losses}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cum. True Rec</span>
+                        <span class="stat-value">${item.cumTrue.wins}-${item.cumTrue.losses}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Week Opt Rec</span>
+                        <span class="stat-value">${item.segmentOpt.wins}-${item.segmentOpt.losses}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cum. Opt Rec</span>
+                        <span class="stat-value">${item.cumOpt.wins}-${item.cumOpt.losses}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">True Win %</span>
-                        <span class="stat-value">${item.truePct}%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Opt Record</span>
-                        <span class="stat-value">${item.optWins}-${item.optLosses}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Opt Win %</span>
-                        <span class="stat-value">${item.optPct}%</span>
+                        <span class="stat-value">${item.cumTruePct}%</span>
                     </div>
                 </div>
             `;
