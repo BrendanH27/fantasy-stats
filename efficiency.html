@@ -459,20 +459,19 @@
             `;
             tableBody.appendChild(tr);
 
-            // Render Card View
+           // Render Card View
             const card = document.createElement('div');
             card.className = 'team-card';
             
             const wins = team.wins !== undefined ? team.wins : 0;
             const losses = team.losses !== undefined ? team.losses : 0;
             const logoUrl = team.logo ? escapeHTML(team.logo) : PLACEHOLDER_LOGO;
-
+            
             card.innerHTML = `
                 <div class="team-header">
                     <img class="team-logo" 
                          src="${logoUrl}" 
-                         alt="${safeTeamName}" 
-                         onerror="this.onerror=null; this.src='${PLACEHOLDER_LOGO}';">
+                         alt="${safeTeamName}">
                     <div class="team-info">
                         <h3>${safeTeamName}${byeTagHTML}</h3>
                         <span class="team-owner">${safeOwnerName} (${wins}-${losses})</span>
@@ -505,6 +504,13 @@
                     </div>
                 </div>
             `;
+            
+            // Safely attach image error fallback via JS event listener
+            const imgElement = card.querySelector('.team-logo');
+            imgElement.addEventListener('error', function() {
+                this.src = PLACEHOLDER_LOGO;
+            }, { once: true });
+            
             cardsContainer.appendChild(card);
         });
     }
