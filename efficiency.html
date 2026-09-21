@@ -187,11 +187,25 @@
                 return;
             }
 
-            // Display League Name if available
-            leagueNameHeading.textContent = yearData.league_name || `Season ${year}`;
+            // Display League Name safely using textContent
+            leagueNameHeading.textContent = yearData.league_name || `Season ${escapeHTML(year)}`;
 
-            // Render details/teams overview (Modify as needed for your UI)
-            dataDisplay.innerHTML = `<p>Successfully loaded data for <strong>${year}</strong>.</p>`;
+            // Safely render content without running unescaped HTML content attributes
+            if (typeof yearData === 'string') {
+                dataDisplay.textContent = yearData;
+            } else {
+                dataDisplay.innerHTML = `<p>Successfully loaded data for <strong>${escapeHTML(year)}</strong>.</p>`;
+            }
+        }
+
+        // Helper function to sanitize text input before parsing innerHTML
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function setStatus(message, type) {
