@@ -3,485 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy League Dashboard</title>
+    <title>League Efficiency Dashboard</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #38bdf8;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --border: #334155;
-            --badge-bg: #f59e0b;
-            --badge-text: #0f172a;
-        }
-
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            color: #333;
+            background-color: #f8f9fa;
         }
 
         h1 {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
         }
 
-        /* Controls */
-        .controls {
+        .controls-container {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
             gap: 1rem;
-            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
         }
 
         select {
-            background: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 0.6rem 1rem;
-            border-radius: 6px;
+            padding: 0.5rem 1rem;
             font-size: 1rem;
-            outline: none;
-        }
-
-        /* Loading / Error state */
-        #status-message {
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--text-sub);
-            margin-top: 3rem;
-        }
-
-        /* Cards Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .team-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .team-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .team-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: var(--border);
-        }
-
-        .team-info h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .team-info span.team-owner {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            background: rgba(0,0,0,0.2);
-            padding: 0.75rem;
             border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
         }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        /* Bye Badge Styling */
-        .bye-badge {
-            background-color: var(--badge-bg);
-            color: var(--badge-text);
-            font-size: 0.65rem;
-            font-weight: bold;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 0.35rem;
-        }
-
-        /* Table View */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 1rem;
-        }
-
-        th, td {
+        #status-message {
+            margin: 1rem 0;
             padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
         }
 
-        th {
-            background: rgba(0,0,0,0.3);
-            color: var(--accent);
+        #status-message:empty {
+            display: none;
         }
 
-        .hidden { display: none; }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .league-title {
+            margin-top: 1.5rem;
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1 id="league-title">Loading League Data...</h1>
-    </header>
+    <h1>League Efficiency Dashboard</h1>
 
-    <div id="status-message">Fetching data from GitHub...</div>
+    <!-- Status & Error Reporting Banner -->
+    <div id="status-message">Loading league data...</div>
 
-    <div id="dashboard" class="hidden">
-        <div class="controls">
-            <div>
-                <label for="year-select">Season Year: </label>
-                <select id="year-select"></select>
-            </div>
-            <div>
-                <label for="week-select">View Segment: </label>
-                <select id="week-select"></select>
-            </div>
-            <div>
-                <label for="view-select">View Style: </label>
-                <select id="view-select">
-                    <option value="table" selected>Table</option>
-                    <option value="cards">Cards</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="table-view">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Team</th>
-                        <th>Owner</th>
-                        <th>Points Scored</th>
-                        <th>Optimal Points</th>
-                        <th>Bench Points</th>
-                        <th>Efficiency</th>
-                        <th>Season Total (Scored)</th>
-                        <th>Season Total (Optimal)</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
-        </div>
-        
-        <div id="cards-view" class="grid hidden"></div>
+    <!-- Controls -->
+    <div class="controls-container">
+        <label for="year-select">Select Season:</label>
+        <select id="year-select" disabled>
+            <option value="">-- Select Year --</option>
+        </select>
     </div>
-</div>
 
-<script>
-    let allLeagueData = null;
-    let selectedYear = null;
+    <!-- Main Output Container -->
+    <main id="dashboard-content">
+        <h2 id="league-name-heading" class="league-title"></h2>
+        <div id="league-data-display"></div>
+    </main>
 
-    // Lightweight SVG placeholder to avoid network calls on missing logos
-    const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="12" font-family="sans-serif">LOGO</text></svg>';
+    <script>
+        let allLeagueData = null;
 
-    // Fetch JSON automatically on page load
-    window.addEventListener('DOMContentLoaded', () => {
-        fetch('./league_data.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                allLeagueData = data;
-                initYearSelector();
-            })
-            .catch(error => {
-                console.error("Error loading JSON:", error);
-                document.getElementById('status-message').textContent = 
-                    "Failed to load 'league_data.json'. Make sure the file exists in the repository root.";
-            });
-    });
+        window.addEventListener('DOMContentLoaded', () => {
+            const statusMsg = document.getElementById('status-message');
 
-    function initYearSelector() {
-        if (!allLeagueData) return;
-
-        // Get years from JSON keys, sorting numerically in descending order (most recent first)
-        const years = Object.keys(allLeagueData)
-            .map(y => parseInt(y, 10))
-            .filter(y => !isNaN(y))
-            .sort((a, b) => b - a);
-
-        if (years.length === 0) {
-            document.getElementById('status-message').textContent = "No valid season year data found in JSON.";
-            return;
-        }
-
-        const yearSelect = document.getElementById('year-select');
-        yearSelect.innerHTML = '';
-
-        years.forEach(year => {
-            const opt = document.createElement('option');
-            opt.value = year;
-            opt.textContent = year;
-            yearSelect.appendChild(opt);
-        });
-
-        // Set default selected year to the most recent year
-        selectedYear = years[0];
-        yearSelect.value = selectedYear;
-
-        // Hide status message & show dashboard container
-        document.getElementById('status-message').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-
-        // Attach year change listener
-        yearSelect.onchange = (e) => {
-            selectedYear = e.target.value;
-            loadYearData();
-        };
-
-        document.getElementById('week-select').onchange = (e) => {
-            const val = e.target.value;
-            renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
-        };
-
-        document.getElementById('view-select').onchange = toggleView;
-
-        // Load current year data
-        loadYearData();
-    }
-
-    function loadYearData() {
-        const yearData = allLeagueData[selectedYear];
-        if (!yearData) return;
-
-        // Set League Title
-        document.getElementById('league-title').textContent = yearData.league_name || `Fantasy League ${selectedYear}`;
-
-        const teams = Object.values(yearData.teams || {});
-        if (teams.length === 0) return;
-
-        const totalWeeks = teams[0].weekly_points ? teams[0].weekly_points.length : 0;
-        const weekSelect = document.getElementById('week-select');
-        weekSelect.innerHTML = '';
-
-        const regSeasonEndWeek = Math.min(14, totalWeeks);
-
-        // Regular Season Totals Option (Default)
-        const seasonOpt = document.createElement('option');
-        seasonOpt.value = 'regular_season_totals';
-        seasonOpt.textContent = `Regular Season Totals (Weeks 1–${regSeasonEndWeek})`;
-        weekSelect.appendChild(seasonOpt);
-
-        // Add standard weekly options (Week 1 through total available weeks)
-        for (let i = 1; i <= totalWeeks; i++) {
-            const opt = document.createElement('option');
-            opt.value = i - 1; // 0-indexed internally
-            opt.textContent = `Week ${i}`;
-            weekSelect.appendChild(opt);
-        }
-
-        // Add Playoffs Aggregate option if dataset extends past week 14
-        if (totalWeeks > 14) {
-            const post14Opt = document.createElement('option');
-            post14Opt.value = 'post14';
-            post14Opt.textContent = `Playoffs Aggregate (Weeks 15–${totalWeeks})`;
-            weekSelect.appendChild(post14Opt);
-        }
-
-        // Render initial view as Regular Season Totals by default for the chosen year
-        renderData('regular_season_totals');
-    }
-
-    function sumArrayRange(arr, start, end) {
-        if (!arr) return 0;
-        return arr.slice(start, end).reduce((sum, val) => sum + (val || 0), 0);
-    }
-
-    function renderData(selection) {
-        const yearData = allLeagueData[selectedYear];
-        if (!yearData || !yearData.teams) return;
-
-        const teams = Object.values(yearData.teams);
-        const cardsContainer = document.getElementById('cards-view');
-        const tableBody = document.getElementById('table-body');
-
-        cardsContainer.innerHTML = '';
-        tableBody.innerHTML = '';
-
-        teams.forEach(team => {
-            const ownerName = team.owner?.[0] 
-                ? `${team.owner[0].firstName} ${team.owner[0].lastName}` 
-                : 'Unknown';
-
-            let pts, optPts, benchPts, eff, seasonPts, seasonOpt;
-            let isByeWeek = false;
-
-            if (selection === 'regular_season_totals') {
-                // Regular Season aggregate calculations (Weeks 1–14 max)
-                const regSeasonLimit = Math.min(14, team.weekly_points.length);
-                pts = sumArrayRange(team.weekly_points, 0, regSeasonLimit).toFixed(2);
-                optPts = sumArrayRange(team.weekly_optimal_points, 0, regSeasonLimit).toFixed(2);
-                benchPts = sumArrayRange(team.weekly_bench_points, 0, regSeasonLimit).toFixed(2);
-                eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
-
-                seasonPts = pts;
-                seasonOpt = optPts;
-            } else if (selection === 'post14') {
-                // Post Week 14 aggregate calculations
-                const totalWeeks = team.weekly_points.length;
-                pts = sumArrayRange(team.weekly_points, 14, totalWeeks).toFixed(2);
-                optPts = sumArrayRange(team.weekly_optimal_points, 14, totalWeeks).toFixed(2);
-                benchPts = sumArrayRange(team.weekly_bench_points, 14, totalWeeks).toFixed(2);
-                eff = optPts > 0 ? ((pts / optPts) * 100).toFixed(1) : '0.0';
-
-                // Regular season aggregate for comparison column
-                const regSeasonLimit = Math.min(14, totalWeeks);
-                seasonPts = sumArrayRange(team.weekly_points, 0, regSeasonLimit).toFixed(2);
-                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, regSeasonLimit).toFixed(2);
-            } else {
-                // Single-week view with dynamic cumulative calculations up to selected week
-                const weekIdx = selection;
-                const currentWeekNum = weekIdx + 1; // 1-indexed week number
-
-                pts = team.weekly_points[weekIdx]?.toFixed(2) || '0.00';
-                optPts = team.weekly_optimal_points[weekIdx]?.toFixed(2) || '0.00';
-                benchPts = team.weekly_bench_points[weekIdx]?.toFixed(2) || '0.00';
-                eff = team.weekly_efficiency[weekIdx]?.toFixed(1) || '0.0';
-
-                // Check if current week is in the team's bye_weeks array
-                if (Array.isArray(team.bye_weeks) && team.bye_weeks.includes(currentWeekNum)) {
-                    isByeWeek = true;
-                }
-
-                // Cumulative total up to selected week
-                seasonPts = sumArrayRange(team.weekly_points, 0, weekIdx + 1).toFixed(2);
-                seasonOpt = sumArrayRange(team.weekly_optimal_points, 0, weekIdx + 1).toFixed(2);
+            // Detect if page is being opened directly as a file without a web server
+            if (window.location.protocol === 'file:') {
+                setStatus("Error: Cannot fetch JSON using file:// protocol. Please run via a local web server (e.g. VS Code Live Server).", "error");
+                return;
             }
 
-            const byeTagHTML = isByeWeek ? `<span class="bye-badge">BYE WEEK</span>` : '';
-
-            // Render Table View
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${team.name}</strong>${byeTagHTML}</td>
-                <td>${ownerName}</td>
-                <td style="color: var(--accent); font-weight: bold;">${pts}</td>
-                <td>${optPts}</td>
-                <td>${benchPts}</td>
-                <td>${eff}%</td>
-                <td style="color: var(--accent); font-weight: bold;">${seasonPts}</td>
-                <td>${seasonOpt}</td>
-            `;
-            tableBody.appendChild(tr);
-
-            // Render Card View
-            const card = document.createElement('div');
-            card.className = 'team-card';
-            card.innerHTML = `
-                <div class="team-header">
-                    <img class="team-logo" 
-                         src="${team.logo || PLACEHOLDER_LOGO}" 
-                         alt="${team.name}" 
-                         onerror="this.onerror=null; this.src='${PLACEHOLDER_LOGO}';">
-                    <div class="team-info">
-                        <h3>${team.name}${byeTagHTML}</h3>
-                        <span class="team-owner">${ownerName} (${team.wins}-${team.losses})</span>
-                    </div>
-                </div>
-                <div class="stat-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Points</span>
-                        <span class="stat-value" style="color: var(--accent)">${pts}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Optimal</span>
-                        <span class="stat-value">${optPts}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Bench Pts</span>
-                        <span class="stat-value">${benchPts}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Efficiency</span>
-                        <span class="stat-value">${eff}%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Season Total</span>
-                        <span class="stat-value" style="color: var(--accent)">${seasonPts}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Season Opt</span>
-                        <span class="stat-value">${seasonOpt}</span>
-                    </div>
-                </div>
-            `;
-            cardsContainer.appendChild(card);
+            fetch('./league_data.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Loaded JSON successfully:", data);
+                    allLeagueData = data;
+                    initYearSelector();
+                })
+                .catch(error => {
+                    console.error("Error loading JSON:", error);
+                    setStatus(`Failed to load 'league_data.json': ${error.message}`, "error");
+                });
         });
-    }
 
-    function toggleView(e) {
-        const view = e.target.value;
-        if (view === 'cards') {
-            document.getElementById('cards-view').classList.remove('hidden');
-            document.getElementById('table-view').classList.add('hidden');
-        } else {
-            document.getElementById('cards-view').classList.add('hidden');
-            document.getElementById('table-view').classList.remove('hidden');
+        function initYearSelector() {
+            if (!allLeagueData) return;
+
+            // 1. Unwrap data if nested under a root property like 'data' or 'leagues'
+            let dataRoot = allLeagueData;
+            if (dataRoot.data && typeof dataRoot.data === 'object') {
+                dataRoot = dataRoot.data;
+            }
+
+            // 2. Extract year keys whether the JSON root is an Object or an Array
+            let years = [];
+
+            if (Array.isArray(dataRoot)) {
+                // Handle array formats: [{ year: 2025, ... }] or [{ season: "2025", ... }]
+                years = dataRoot
+                    .map(item => parseInt(item.year || item.season, 10))
+                    .filter(y => !isNaN(y));
+            } else if (typeof dataRoot === 'object' && dataRoot !== null) {
+                // Handle standard object format: { "2025": { ... }, "2024": { ... } }
+                years = Object.keys(dataRoot)
+                    .map(y => parseInt(y, 10))
+                    .filter(y => !isNaN(y));
+            }
+
+            // 3. Remove duplicates and sort descending (most recent first)
+            years = [...new Set(years)].sort((a, b) => b - a);
+
+            // 4. Handle empty/invalid years
+            if (years.length === 0) {
+                console.warn("No numeric year keys found. Top-level keys available:", Object.keys(dataRoot));
+                setStatus("No valid season year data found in JSON.", "error");
+                return;
+            }
+
+            // Clear status message on success
+            clearStatus();
+
+            // 5. Populate and enable Year Dropdown
+            const yearSelect = document.getElementById('year-select');
+            yearSelect.innerHTML = years
+                .map(y => `<option value="${y}">${y}</option>`)
+                .join('');
+            
+            yearSelect.disabled = false;
+
+            // Event listener to render content when year changes
+            yearSelect.addEventListener('change', (e) => {
+                displayYearData(e.target.value);
+            });
+
+            // Display data for the most recent year by default
+            displayYearData(years[0]);
         }
-    }
-</script>
 
+        function displayYearData(year) {
+            const leagueNameHeading = document.getElementById('league-name-heading');
+            const dataDisplay = document.getElementById('league-data-display');
+
+            // Handle nested vs direct root lookup
+            let yearData = allLeagueData[year] || (allLeagueData.data && allLeagueData.data[year]);
+
+            if (!yearData) {
+                leagueNameHeading.textContent = "";
+                dataDisplay.textContent = "No data found for selected year.";
+                return;
+            }
+
+            // Display League Name if available
+            leagueNameHeading.textContent = yearData.league_name || `Season ${year}`;
+
+            // Render details/teams overview (Modify as needed for your UI)
+            dataDisplay.innerHTML = `<p>Successfully loaded data for <strong>${year}</strong>.</p>`;
+        }
+
+        function setStatus(message, type) {
+            const statusMsg = document.getElementById('status-message');
+            if (statusMsg) {
+                statusMsg.textContent = message;
+                statusMsg.className = type === 'error' ? 'status-error' : 'status-success';
+            }
+        }
+
+        function clearStatus() {
+            const statusMsg = document.getElementById('status-message');
+            if (statusMsg) {
+                statusMsg.textContent = '';
+                statusMsg.className = '';
+            }
+        }
+    </script>
 </body>
 </html>
