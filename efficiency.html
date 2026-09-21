@@ -188,6 +188,10 @@
     <div id="dashboard" class="hidden">
         <div class="controls">
             <div>
+                <label for="year-select">Season Year: </label>
+                <select id="year-select"></select>
+            </div>
+            <div>
                 <label for="week-select">View Segment: </label>
                 <select id="week-select"></select>
             </div>
@@ -223,7 +227,8 @@
 </div>
 
 <script>
-    let leagueData = null;
+    let allLeagueData = null;
+    let selectedYear = null;
 
     // Lightweight SVG placeholder to avoid network calls on missing logos
     const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="12" font-family="sans-serif">LOGO</text></svg>';
@@ -238,8 +243,8 @@
                 return response.json();
             })
             .then(data => {
-                leagueData = data;
-                initDashboard();
+                allLeagueData = data;
+                initYearSelector();
             })
             .catch(error => {
                 console.error("Error loading JSON:", error);
@@ -248,19 +253,66 @@
             });
     });
 
-    function initDashboard() {
-        if (!leagueData) return;
+    function initYearSelector() {
+        if (!allLeagueData) return;
 
-        // Hide status message
+        // Get years from JSON keys, sorting numerically in descending order (most recent first)
+        const years = Object.keys(allLeagueData)
+            .map(y => parseInt(y, 10))
+            .filter(y => !isNaN(y))
+            .sort((a, b) => b - a);
+
+        if (years.length === 0) {
+            document.getElementById('status-message').textContent = "No valid season year data found in JSON.";
+            return;
+        }
+
+        const yearSelect = document.getElementById('year-select');
+        yearSelect.innerHTML = '';
+
+        years.forEach(year => {
+            const opt = document.createElement('option');
+            opt.value = year;
+            opt.textContent = year;
+            yearSelect.appendChild(opt);
+        });
+
+        // Set default selected year to the most recent year
+        selectedYear = years[0];
+        yearSelect.value = selectedYear;
+
+        // Hide status message & show dashboard container
         document.getElementById('status-message').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+
+        // Attach year change listener
+        yearSelect.onchange = (e) => {
+            selectedYear = e.target.value;
+            loadYearData();
+        };
+
+        document.getElementById('week-select').onchange = (e) => {
+            const val = e.target.value;
+            renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
+        };
+
+        document.getElementById('view-select').onchange = toggleView;
+
+        // Load current year data
+        loadYearData();
+    }
+
+    function loadYearData() {
+        const yearData = allLeagueData[selectedYear];
+        if (!yearData) return;
 
         // Set League Title
-        document.getElementById('league-title').textContent = leagueData.league_name || "Fantasy League";
+        document.getElementById('league-title').textContent = yearData.league_name || `Fantasy League ${selectedYear}`;
 
-        const teams = Object.values(leagueData.teams);
+        const teams = Object.values(yearData.teams || {});
         if (teams.length === 0) return;
 
-        const totalWeeks = teams[0].weekly_points.length;
+        const totalWeeks = teams[0].weekly_points ? teams[0].weekly_points.length : 0;
         const weekSelect = document.getElementById('week-select');
         weekSelect.innerHTML = '';
 
@@ -288,18 +340,8 @@
             weekSelect.appendChild(post14Opt);
         }
 
-        // Show Dashboard
-        document.getElementById('dashboard').classList.remove('hidden');
-
-        // Render initial view as Regular Season Totals by default
+        // Render initial view as Regular Season Totals by default for the chosen year
         renderData('regular_season_totals');
-
-        // Attach Event Listeners
-        weekSelect.onchange = (e) => {
-            const val = e.target.value;
-            renderData(val === 'post14' || val === 'regular_season_totals' ? val : parseInt(val));
-        };
-        document.getElementById('view-select').onchange = toggleView;
     }
 
     function sumArrayRange(arr, start, end) {
@@ -308,7 +350,10 @@
     }
 
     function renderData(selection) {
-        const teams = Object.values(leagueData.teams);
+        const yearData = allLeagueData[selectedYear];
+        if (!yearData || !yearData.teams) return;
+
+        const teams = Object.values(yearData.teams);
         const cardsContainer = document.getElementById('cards-view');
         const tableBody = document.getElementById('table-body');
 
