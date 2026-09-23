@@ -8216,7 +8216,7 @@
             }
         }
     },
-    "2026":{
+    "2026":    {
         "league_name": "Gordon Heights x Weenie Hut 2026",
         "teams": {
             "1": {
@@ -8322,47 +8322,60 @@
                     }
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/876d20f0-9e59-11f1-b987-2730e362696d",
-                "wins": 0,
+                "wins": 1,
                 "losses": 1,
-                "points_for": 147.06,
-                "points_against": 169.16,
-                "bench_points_total": 57.0,
-                "optimal_points_total": 175.46,
-                "actual_points_total": 147.06,
+                "points_for": 281.44,
+                "points_against": 286.92,
+                "bench_points_total": 134.22,
+                "optimal_points_total": 330.94,
+                "actual_points_total": 281.44,
                 "weekly_points": [
-                    147.06
+                    147.06,
+                    134.38
                 ],
                 "weekly_optimal_points": [
-                    175.46
+                    175.46,
+                    155.48
                 ],
                 "weekly_bench_points": [
-                    57.0
+                    57.0,
+                    77.22
                 ],
                 "weekly_efficiency": [
-                    83.8
+                    83.8,
+                    86.4
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "20.95"
+                    "20.95",
+                    "21.70"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 9,
                         "losses": 2
+                    },
+                    {
+                        "wins": 6,
+                        "losses": 5
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 9,
                         "losses": 2
+                    },
+                    {
+                        "wins": 7,
+                        "losses": 4
                     }
                 ],
-                "drop": 2,
-                "acquisitions": 1,
+                "drop": 3,
+                "acquisitions": 2,
                 "moves_to_ir": 2,
                 "trades": 2,
                 "point_per_position_per_week": [],
-                "total_efficiency": 83.8
+                "total_efficiency": 85.0
             },
             "2": {
                 "name": "Soap27",
@@ -8467,39 +8480,52 @@
                     }
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/d8c83330-a666-11f1-8b95-b1e59b7020ef",
-                "wins": 0,
+                "wins": 1,
                 "losses": 1,
-                "points_for": 122.86,
-                "points_against": 210.96,
-                "bench_points_total": 55.26,
-                "optimal_points_total": 143.15999999999997,
-                "actual_points_total": 122.86000000000001,
+                "points_for": 277.24,
+                "points_against": 364.14,
+                "bench_points_total": 117.13999999999999,
+                "optimal_points_total": 320.93999999999994,
+                "actual_points_total": 277.24,
                 "weekly_points": [
-                    122.86000000000001
+                    122.86000000000001,
+                    154.38
                 ],
                 "weekly_optimal_points": [
-                    143.15999999999997
+                    143.15999999999997,
+                    177.78
                 ],
                 "weekly_bench_points": [
-                    55.26
+                    55.26,
+                    61.879999999999995
                 ],
                 "weekly_efficiency": [
-                    85.8
+                    85.8,
+                    86.8
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "13.90"
+                    "13.90",
+                    "19.35"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 5,
                         "losses": 6
+                    },
+                    {
+                        "wins": 11,
+                        "losses": 0
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 4,
                         "losses": 7
+                    },
+                    {
+                        "wins": 11,
+                        "losses": 0
                     }
                 ],
                 "drop": 0,
@@ -8507,7 +8533,7 @@
                 "moves_to_ir": 1,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 85.8
+                "total_efficiency": 86.4
             },
             "3": {
                 "name": "New York Nicks",
@@ -8613,46 +8639,59 @@
                 ],
                 "logo": "https://g.espncdn.com/lm-static/logo-packs/ffl/MickeyAndDonald-Disney/Disney-04.svg",
                 "wins": 1,
-                "losses": 0,
-                "points_for": 111.7,
-                "points_against": 109.64,
-                "bench_points_total": 31.3,
-                "optimal_points_total": 121.7,
-                "actual_points_total": 111.7,
+                "losses": 1,
+                "points_for": 195.5,
+                "points_against": 247.58,
+                "bench_points_total": 72.5,
+                "optimal_points_total": 227.8,
+                "actual_points_total": 195.5,
                 "weekly_points": [
-                    111.7
+                    111.7,
+                    83.80000000000001
                 ],
                 "weekly_optimal_points": [
-                    121.7
+                    121.7,
+                    106.10000000000001
                 ],
                 "weekly_bench_points": [
-                    31.3
+                    31.3,
+                    41.2
                 ],
                 "weekly_efficiency": [
-                    91.8
+                    91.8,
+                    79.0
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "17.55"
+                    "17.55",
+                    "14.05"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 3,
                         "losses": 8
+                    },
+                    {
+                        "wins": 1,
+                        "losses": 10
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 1,
                         "losses": 10
+                    },
+                    {
+                        "wins": 1,
+                        "losses": 10
                     }
                 ],
-                "drop": 5,
-                "acquisitions": 5,
+                "drop": 7,
+                "acquisitions": 7,
                 "moves_to_ir": 1,
-                "trades": 0,
+                "trades": 1,
                 "point_per_position_per_week": [],
-                "total_efficiency": 91.8
+                "total_efficiency": 85.8
             },
             "4": {
                 "name": "Dunkirk Double Ds",
@@ -8758,38 +8797,51 @@
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/0e564b60-94a0-11f0-90f7-112fa0f42e74",
                 "wins": 0,
-                "losses": 1,
-                "points_for": 105.4,
-                "points_against": 114.94,
-                "bench_points_total": 73.1,
-                "optimal_points_total": 150.6,
-                "actual_points_total": 105.39999999999999,
+                "losses": 2,
+                "points_for": 223.16,
+                "points_against": 249.32,
+                "bench_points_total": 148.28,
+                "optimal_points_total": 286.96000000000004,
+                "actual_points_total": 223.15999999999997,
                 "weekly_points": [
-                    105.39999999999999
+                    105.39999999999999,
+                    117.75999999999999
                 ],
                 "weekly_optimal_points": [
-                    150.6
+                    150.6,
+                    136.36
                 ],
                 "weekly_bench_points": [
-                    73.1
+                    73.1,
+                    75.18
                 ],
                 "weekly_efficiency": [
-                    70.0
+                    70.0,
+                    86.4
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "15.30"
+                    "15.30",
+                    "16.00"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 1,
                         "losses": 10
+                    },
+                    {
+                        "wins": 5,
+                        "losses": 6
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 6,
                         "losses": 5
+                    },
+                    {
+                        "wins": 5,
+                        "losses": 6
                     }
                 ],
                 "drop": 2,
@@ -8797,7 +8849,7 @@
                 "moves_to_ir": 1,
                 "trades": 1,
                 "point_per_position_per_week": [],
-                "total_efficiency": 70.0
+                "total_efficiency": 77.8
             },
             "5": {
                 "name": "Brendan Love Jeanty",
@@ -8903,46 +8955,59 @@
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/147c23a0-9dd9-11f1-9ea5-d574bdafef15",
                 "wins": 1,
-                "losses": 0,
-                "points_for": 127.96,
-                "points_against": 126.7,
-                "bench_points_total": 54.78,
-                "optimal_points_total": 148.35999999999999,
-                "actual_points_total": 127.96,
+                "losses": 1,
+                "points_for": 205.38,
+                "points_against": 268.96,
+                "bench_points_total": 95.88,
+                "optimal_points_total": 242.76,
+                "actual_points_total": 205.38,
                 "weekly_points": [
-                    127.96
+                    127.96,
+                    77.42
                 ],
                 "weekly_optimal_points": [
-                    148.35999999999999
+                    148.35999999999999,
+                    94.4
                 ],
                 "weekly_bench_points": [
-                    54.78
+                    54.78,
+                    41.1
                 ],
                 "weekly_efficiency": [
-                    86.2
+                    86.2,
+                    82.0
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "19.90"
+                    "19.90",
+                    "14.55"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 8,
                         "losses": 3
+                    },
+                    {
+                        "wins": 0,
+                        "losses": 11
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 5,
                         "losses": 6
+                    },
+                    {
+                        "wins": 0,
+                        "losses": 11
                     }
                 ],
-                "drop": 2,
-                "acquisitions": 1,
+                "drop": 3,
+                "acquisitions": 2,
                 "moves_to_ir": 2,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 86.2
+                "total_efficiency": 84.6
             },
             "6": {
                 "name": "Puka'd your mom ",
@@ -9048,46 +9113,59 @@
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/97cd23e0-9dd3-11f1-9ea5-d574bdafef15",
                 "wins": 0,
-                "losses": 1,
-                "points_for": 126.7,
-                "points_against": 127.96,
-                "bench_points_total": 80.60000000000001,
-                "optimal_points_total": 157.9,
-                "actual_points_total": 126.7,
+                "losses": 2,
+                "points_for": 226.58,
+                "points_against": 243.18,
+                "bench_points_total": 109.56,
+                "optimal_points_total": 266.68,
+                "actual_points_total": 226.57999999999998,
                 "weekly_points": [
-                    126.7
+                    126.7,
+                    99.88
                 ],
                 "weekly_optimal_points": [
-                    157.9
+                    157.9,
+                    108.78
                 ],
                 "weekly_bench_points": [
-                    80.60000000000001
+                    80.60000000000001,
+                    28.96
                 ],
                 "weekly_efficiency": [
-                    80.2
+                    80.2,
+                    91.8
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "18.85"
+                    "18.85",
+                    "16.55"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 7,
                         "losses": 4
+                    },
+                    {
+                        "wins": 3,
+                        "losses": 8
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 8,
                         "losses": 3
+                    },
+                    {
+                        "wins": 2,
+                        "losses": 9
                     }
                 ],
-                "drop": 3,
-                "acquisitions": 2,
+                "drop": 4,
+                "acquisitions": 3,
                 "moves_to_ir": 1,
-                "trades": 2,
+                "trades": 3,
                 "point_per_position_per_week": [],
-                "total_efficiency": 80.2
+                "total_efficiency": 85.0
             },
             "7": {
                 "name": "Winterfell Direwolves",
@@ -9192,47 +9270,60 @@
                     }
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/314ffdd0-8dbc-11f1-ba11-258ab190f341",
-                "wins": 1,
+                "wins": 2,
                 "losses": 0,
-                "points_for": 125.26,
-                "points_against": 93.62,
-                "bench_points_total": 24.72,
-                "optimal_points_total": 129.26,
-                "actual_points_total": 125.26,
+                "points_for": 263.2,
+                "points_against": 177.42,
+                "bench_points_total": 43.82,
+                "optimal_points_total": 269.4,
+                "actual_points_total": 263.2,
                 "weekly_points": [
-                    125.26
+                    125.26,
+                    137.94
                 ],
                 "weekly_optimal_points": [
-                    129.26
+                    129.26,
+                    140.14
                 ],
                 "weekly_bench_points": [
-                    24.72
+                    24.72,
+                    19.1
                 ],
                 "weekly_efficiency": [
-                    96.9
+                    96.9,
+                    98.4
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "21.10"
+                    "21.10",
+                    "24.95"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 6,
                         "losses": 5
+                    },
+                    {
+                        "wins": 7,
+                        "losses": 4
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 2,
                         "losses": 9
+                    },
+                    {
+                        "wins": 6,
+                        "losses": 5
                     }
                 ],
-                "drop": 3,
-                "acquisitions": 1,
+                "drop": 4,
+                "acquisitions": 2,
                 "moves_to_ir": 1,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 96.9
+                "total_efficiency": 97.7
             },
             "8": {
                 "name": "Liebs and Friends",
@@ -9337,30 +9428,39 @@
                     }
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/7988c750-8ec3-11f1-9098-9b42557a78d2",
-                "wins": 1,
+                "wins": 2,
                 "losses": 0,
-                "points_for": 114.94,
-                "points_against": 105.4,
-                "bench_points_total": 74.4,
-                "optimal_points_total": 155.3,
-                "actual_points_total": 114.93999999999998,
+                "points_for": 230.16,
+                "points_against": 205.28,
+                "bench_points_total": 123.68,
+                "optimal_points_total": 284.18,
+                "actual_points_total": 230.16,
                 "weekly_points": [
-                    114.93999999999998
+                    114.93999999999998,
+                    115.22000000000001
                 ],
                 "weekly_optimal_points": [
-                    155.3
+                    155.3,
+                    128.88
                 ],
                 "weekly_bench_points": [
-                    74.4
+                    74.4,
+                    49.28000000000001
                 ],
                 "weekly_efficiency": [
-                    74.0
+                    74.0,
+                    89.4
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "18.35"
+                    "18.35",
+                    "19.45"
                 ],
                 "true_record_per_week": [
+                    {
+                        "wins": 4,
+                        "losses": 7
+                    },
                     {
                         "wins": 4,
                         "losses": 7
@@ -9370,14 +9470,18 @@
                     {
                         "wins": 7,
                         "losses": 4
+                    },
+                    {
+                        "wins": 3,
+                        "losses": 8
                     }
                 ],
-                "drop": 3,
+                "drop": 4,
                 "acquisitions": 3,
                 "moves_to_ir": 1,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 74.0
+                "total_efficiency": 81.0
             },
             "9": {
                 "name": "The Price is Rice ",
@@ -9482,47 +9586,60 @@
                     }
                 ],
                 "logo": "https://g.espncdn.com/lm-static/logo-packs/core/RalphBreaksTheInternet/ralph-04.svg",
-                "wins": 0,
+                "wins": 1,
                 "losses": 1,
-                "points_for": 93.62,
-                "points_against": 125.26,
-                "bench_points_total": 29.02,
-                "optimal_points_total": 106.42,
-                "actual_points_total": 93.62,
+                "points_for": 235.88,
+                "points_against": 202.68,
+                "bench_points_total": 72.1,
+                "optimal_points_total": 262.09999999999997,
+                "actual_points_total": 235.88000000000002,
                 "weekly_points": [
-                    93.62
+                    93.62,
+                    142.26000000000002
                 ],
                 "weekly_optimal_points": [
-                    106.42
+                    106.42,
+                    155.67999999999998
                 ],
                 "weekly_bench_points": [
-                    29.02
+                    29.02,
+                    43.08
                 ],
                 "weekly_efficiency": [
-                    88.0
+                    88.0,
+                    91.4
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "12.40"
+                    "12.40",
+                    "19.95"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 0,
                         "losses": 11
+                    },
+                    {
+                        "wins": 8,
+                        "losses": 3
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 0,
                         "losses": 11
+                    },
+                    {
+                        "wins": 8,
+                        "losses": 3
                     }
                 ],
-                "drop": 2,
-                "acquisitions": 2,
+                "drop": 4,
+                "acquisitions": 4,
                 "moves_to_ir": 2,
                 "trades": 2,
                 "point_per_position_per_week": [],
-                "total_efficiency": 88.0
+                "total_efficiency": 90.0
             },
             "10": {
                 "name": "Matsumura Fishworks",
@@ -9627,47 +9744,60 @@
                     }
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/28fda300-9dd2-11f1-a6f4-1fb3ad51851a",
-                "wins": 1,
+                "wins": 2,
                 "losses": 0,
-                "points_for": 210.96,
-                "points_against": 122.86,
-                "bench_points_total": 85.44,
-                "optimal_points_total": 237.96,
-                "actual_points_total": 210.96,
+                "points_for": 355.68,
+                "points_against": 219.76,
+                "bench_points_total": 151.72,
+                "optimal_points_total": 393.88,
+                "actual_points_total": 355.68,
                 "weekly_points": [
-                    210.96
+                    210.96,
+                    144.72
                 ],
                 "weekly_optimal_points": [
-                    237.96
+                    237.96,
+                    155.92000000000002
                 ],
                 "weekly_bench_points": [
-                    85.44
+                    85.44,
+                    66.28
                 ],
                 "weekly_efficiency": [
-                    88.7
+                    88.7,
+                    92.8
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "36.70"
+                    "36.70",
+                    "33.10"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 11,
                         "losses": 0
+                    },
+                    {
+                        "wins": 9,
+                        "losses": 2
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 11,
                         "losses": 0
+                    },
+                    {
+                        "wins": 9,
+                        "losses": 2
                     }
                 ],
                 "drop": 2,
-                "acquisitions": 1,
-                "moves_to_ir": 0,
+                "acquisitions": 2,
+                "moves_to_ir": 1,
                 "trades": 1,
                 "point_per_position_per_week": [],
-                "total_efficiency": 88.7
+                "total_efficiency": 90.3
             },
             "11": {
                 "name": "Band$ Emeka Dance",
@@ -9773,46 +9903,59 @@
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/0d872880-ac87-11f1-b3fa-cd9add676ca8",
                 "wins": 0,
-                "losses": 1,
-                "points_for": 109.64,
-                "points_against": 111.7,
-                "bench_points_total": 67.34,
-                "optimal_points_total": 131.54000000000002,
-                "actual_points_total": 109.64,
+                "losses": 2,
+                "points_for": 262.82,
+                "points_against": 266.08,
+                "bench_points_total": 119.54,
+                "optimal_points_total": 302.52,
+                "actual_points_total": 262.82,
                 "weekly_points": [
-                    109.64
+                    109.64,
+                    153.18
                 ],
                 "weekly_optimal_points": [
-                    131.54000000000002
+                    131.54000000000002,
+                    170.98
                 ],
                 "weekly_bench_points": [
-                    67.34
+                    67.34,
+                    52.2
                 ],
                 "weekly_efficiency": [
-                    83.4
+                    83.4,
+                    89.6
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "16.25"
+                    "16.25",
+                    "19.60"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 2,
                         "losses": 9
+                    },
+                    {
+                        "wins": 10,
+                        "losses": 1
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 3,
                         "losses": 8
+                    },
+                    {
+                        "wins": 10,
+                        "losses": 1
                     }
                 ],
-                "drop": 4,
-                "acquisitions": 1,
-                "moves_to_ir": 2,
+                "drop": 6,
+                "acquisitions": 2,
+                "moves_to_ir": 3,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 83.4
+                "total_efficiency": 86.9
             },
             "12": {
                 "name": "GibbWok ",
@@ -9918,38 +10061,51 @@
                 ],
                 "logo": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/93818cf0-9dd2-11f1-b987-2730e362696d",
                 "wins": 1,
-                "losses": 0,
-                "points_for": 169.16,
-                "points_against": 147.06,
-                "bench_points_total": 43.0,
-                "optimal_points_total": 180.55999999999997,
-                "actual_points_total": 169.15999999999997,
+                "losses": 1,
+                "points_for": 266.06,
+                "points_against": 291.78,
+                "bench_points_total": 101.3,
+                "optimal_points_total": 309.56,
+                "actual_points_total": 266.05999999999995,
                 "weekly_points": [
-                    169.15999999999997
+                    169.15999999999997,
+                    96.9
                 ],
                 "weekly_optimal_points": [
-                    180.55999999999997
+                    180.55999999999997,
+                    129.00000000000003
                 ],
                 "weekly_bench_points": [
-                    43.0
+                    43.0,
+                    58.3
                 ],
                 "weekly_efficiency": [
-                    93.7
+                    93.7,
+                    75.1
                 ],
                 "bye_weeks": [],
                 "espn_power_ranking": [
-                    "27.25"
+                    "27.25",
+                    "20.95"
                 ],
                 "true_record_per_week": [
                     {
                         "wins": 10,
                         "losses": 1
+                    },
+                    {
+                        "wins": 2,
+                        "losses": 9
                     }
                 ],
                 "optimal_true_record_per_week": [
                     {
                         "wins": 10,
                         "losses": 1
+                    },
+                    {
+                        "wins": 4,
+                        "losses": 7
                     }
                 ],
                 "drop": 2,
@@ -9957,7 +10113,7 @@
                 "moves_to_ir": 1,
                 "trades": 0,
                 "point_per_position_per_week": [],
-                "total_efficiency": 93.7
+                "total_efficiency": 85.9
             }
         }
     }
