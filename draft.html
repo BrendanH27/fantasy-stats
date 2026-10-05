@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy League Draft Recap</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --badge-bg: #f59e0b;
+            --badge-text: #0f172a;
+            --error-bg: #450a0a;
+            --error-text: #fca5a5;
+            --error-border: #7f1d1d;
+
+            /* Position Color Coding */
+            --pos-qb: #ef4444;
+            --pos-rb: #22c55e;
+            --pos-wr: #3b82f6;
+            --pos-te: #a855f7;
+            --pos-k: #eab308;
+            --pos-dst: #64748b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .nav-link:hover { color: var(--accent); }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        select, input {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        select { cursor: pointer; }
+
+        /* Stats Bar */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        .summary-val {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-top: 0.25rem;
+        }
+
+        /* Draft Board Matrix View */
+        .draft-board-container {
+            overflow-x: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .draft-board {
+            display: grid;
+            gap: 0.5rem;
+            min-width: 1000px;
+        }
+
+        .board-pick {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: relative;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 65px;
+        }
+
+        .pick-num {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 1.1;
+            margin: 0.2rem 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pos-badge {
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            color: #fff;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .pos-QB { background-color: var(--pos-qb); }
+        .pos-RB { background-color: var(--pos-rb); }
+        .pos-WR { background-color: var(--pos-wr); }
+        .pos-TE { background-color: var(--pos-te); }
+        .pos-K { background-color: var(--pos-k); color: #000; }
+        .pos-DEF, .pos-DST { background-color: var(--pos-dst); }
+
+        /* Table View */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(0,0,0,0.3);
+            color: var(--accent);
+        }
+
+        /* Team Rosters View */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .team-title {
+            font-size: 1.1rem;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .roster-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .roster-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+        }
+
+        #status-message {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            margin-top: 3rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .status-error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="league-title">Draft Recap</h1>
+        <a href="./index.html" class="nav-link">&larr; Back to Dashboard</a>
+    </header>
+
+    <div id="status-message">Loading draft data...</div>
+
+    <div id="draft-dashboard" class="hidden">
+        
+        <!-- Summary Banner -->
+        <div class="stats-summary" id="stats-summary"></div>
+
+        <!-- Filter & View Controls -->
+        <div class="controls">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <div class="control-group hidden" id="year-select-container">
+                    <label for="year-select">Season: </label>
+                    <select id="year-select"></select>
+                </div>
+                <div class="control-group">
+                    <label for="pos-filter">Position: </label>
+                    <select id="pos-filter">
+                        <option value="ALL">All Positions</option>
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                        <option value="K">K</option>
+                        <option value="DST">DST</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <input type="text" id="search-input" placeholder="Search player or team...">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="view-select">View Format: </label>
+                <select id="view-select">
+                    <option value="board" selected>Draft Board</option>
+                    <option value="table">Draft Log (Table)</option>
+                    <option value="teams">Rosters by Team</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- View 1: Draft Board Grid -->
+        <div id="board-view" class="draft-board-container">
+            <div id="draft-board" class="draft-board"></div>
+        </div>
+
+        <!-- View 2: Table View -->
+        <div id="table-view" class="hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pick</th>
+                        <th>Rnd</th>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>Drafted By</th>
+                        <th>Pos Rank</th>
+                        <th>PPG</th>
+                        <th>Total Pts</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+
+        <!-- View 3: Team Rosters -->
+        <div id="teams-view" class="team-grid hidden"></div>
+
+    </div>
+</div>
+
+<script>
+    let rawJSONData = null;
+    let activeLeagueData = null;
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.location.protocol === 'file:') {
+            showError("Cannot fetch JSON using file:// protocol. Please open via a local web server.");
+            return;
+        }
+
+        fetch('./league_data.json')
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => {
+                rawJSONData = data;
+                initDashboard();
+            })
+            .catch(err => {
+                console.error("Error loading JSON:", err);
+                showError(`Failed to load 'league_data.json': ${err.message}`);
+            });
+    });
+
+    function showError(msg) {
+        const statusMsg = document.getElementById('status-message');
+        statusMsg.textContent = msg;
+        statusMsg.classList.add('status-error');
+        statusMsg.classList.remove('hidden');
+        document.getElementById('draft-dashboard').classList.add('hidden');
+    }
+
+    function initDashboard() {
+        let rootData = rawJSONData.data || rawJSONData;
+        let years = [];
+
+        if (!Array.isArray(rootData) && typeof rootData === 'object') {
+            const keys = Object.keys(rootData);
+            years = keys.filter(k => !isNaN(parseInt(k, 10))).sort((a, b) => b - a);
+        }
+
+        const yearContainer = document.getElementById('year-select-container');
+        const yearSelect = document.getElementById('year-select');
+
+        if (years.length > 0) {
+            yearSelect.innerHTML = years.map(y => `<option value="${y}">Season ${y}</option>`).join('');
+            yearContainer.classList.remove('hidden');
+            
+            yearSelect.onchange = (e) => {
+                activeLeagueData = rootData[e.target.value];
+                renderAllViews();
+            };
+            activeLeagueData = rootData[years[0]];
+        } else {
+            yearContainer.classList.add('hidden');
+            activeLeagueData = rootData;
+        }
+
+        document.getElementById('pos-filter').onchange = renderAllViews;
+        document.getElementById('search-input').oninput = renderAllViews;
+        document.getElementById('view-select').onchange = toggleView;
+
+        renderAllViews();
+    }
+
+    function getFilteredDraftPicks() {
+        if (!activeLeagueData || !Array.isArray(activeLeagueData.draft)) return [];
+
+        const pos = document.getElementById('pos-filter').value;
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+
+        return activeLeagueData.draft.filter(pick => {
+            const matchPos = pos === 'ALL' || pick.position === pos;
+            const matchQuery = !query || 
+                pick.name.toLowerCase().includes(query) || 
+                pick.takenBy.toLowerCase().includes(query);
+
+            return matchPos && matchQuery;
+        });
+    }
+
+    function renderAllViews() {
+        if (!activeLeagueData || !activeLeagueData.draft) {
+            showError("JSON structure is missing expected 'draft' array.");
+            return;
+        }
+
+        document.getElementById('status-message').classList.add('hidden');
+        document.getElementById('draft-dashboard').classList.remove('hidden');
+        document.getElementById('league-title').textContent = `${activeLeagueData.league_name || 'League'} - Draft Board`;
+
+        const draftData = activeLeagueData.draft;
+        const filteredPicks = getFilteredDraftPicks();
+
+        renderSummaryStats(draftData);
+        renderDraftBoard(filteredPicks);
+        renderDraftTable(filteredPicks);
+        renderTeamRosters(filteredPicks);
+    }
+
+    function renderSummaryStats(draft) {
+        const statsElem = document.getElementById('stats-summary');
+        if (!draft.length) {
+            statsElem.innerHTML = '';
+            return;
+        }
+
+        const totalPicks = draft.length;
+        
+        // Find Highest Scorer
+        const topScorer = [...draft].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))[0];
+        
+        // Find "Best Value" (high points picked late)
+        const bestValue = [...draft].sort((a, b) => {
+            const valA = (a.totalPoints || 0) * (a.overallPick || 1);
+            const valB = (b.totalPoints || 0) * (b.overallPick || 1);
+            return valB - valA;
+        })[0];
+
+        statsElem.innerHTML = `
+            <div class="summary-card">
+                <div class="summary-title">Total Picks</div>
+                <div class="summary-val">${totalPicks}</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Top Drafted Scorer</div>
+                <div class="summary-val" style="font-size: 1rem;">
+                    ${escapeHTML(topScorer?.name || 'N/A')}
+                    <br><span style="font-size:0.8rem; color: var(--text-sub)">${topScorer?.totalPoints || 0} pts</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Best Value Pick</div>
+                <div class="summary-val" style="font-size: 1rem;">
+                    ${escapeHTML(bestValue?.name || 'N/A')}
+                    <br><span style="font-size:0.8rem; color: var(--text-sub)">Pick #${bestValue?.overallPick} (${bestValue?.totalPoints || 0} pts)</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderDraftBoard(picks) {
+        const board = document.getElementById('draft-board');
+        board.innerHTML = '';
+
+        if (picks.length === 0) {
+            board.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 2rem; color: var(--text-sub)">No picks found matching filters.</div>`;
+            return;
+        }
+
+        // Determine unique teams to calculate draft columns
+        const teamsSet = new Set(activeLeagueData.draft.map(p => p.takenBy));
+        const numTeams = teamsSet.size || 10;
+
+        board.style.gridTemplateColumns = `repeat(${numTeams}, minmax(110px, 1fr))`;
+
+        picks.forEach(pick => {
+            const pickDiv = document.createElement('div');
+            pickDiv.className = 'board-pick';
+            
+            const posClass = `pos-${escapeHTML(pick.position)}`;
+            const pts = pick.totalPoints !== undefined ? `${pick.totalPoints} pts` : '';
+
+            pickDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="pick-num">#${pick.overallPick} (${pick.roundTaken}.${pick.roundPick})</span>
+                    <span class="pos-badge ${posClass}">${escapeHTML(pick.position)}</span>
+                </div>
+                <div class="player-name" title="${escapeHTML(pick.name)}">${escapeHTML(pick.name)}</div>
+                <div style="font-size:0.65rem; color: var(--text-sub); display:flex; justify-content:space-between;">
+                    <span>${escapeHTML(pick.takenBy)}</span>
+                    <span style="color:var(--accent)">${pts}</span>
+                </div>
+            `;
+            board.appendChild(pickDiv);
+        });
+    }
+
+    function renderDraftTable(picks) {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+
+        picks.forEach(pick => {
+            const tr = document.createElement('tr');
+            const posClass = `pos-${escapeHTML(pick.position)}`;
+
+            tr.innerHTML = `
+                <td><strong>#${pick.overallPick}</strong></td>
+                <td>R${pick.roundTaken}.${pick.roundPick}</td>
+                <td><strong>${escapeHTML(pick.name)}</strong></td>
+                <td><span class="pos-badge ${posClass}">${escapeHTML(pick.position)}</span></td>
+                <td>${escapeHTML(pick.takenBy)}</td>
+                <td>#${pick.positionRank || '-'}</td>
+                <td>${pick.pointsPerGame !== undefined ? pick.pointsPerGame : '-'}</td>
+                <td style="color: var(--accent); font-weight: bold;">${pick.totalPoints !== undefined ? pick.totalPoints : '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderTeamRosters(picks) {
+        const container = document.getElementById('teams-view');
+        container.innerHTML = '';
+
+        // Group picks by team name
+        const teamGroups = {};
+        picks.forEach(pick => {
+            if (!teamGroups[pick.takenBy]) teamGroups[pick.takenBy] = [];
+            teamGroups[pick.takenBy].push(pick);
+        });
+
+        Object.keys(teamGroups).forEach(teamName => {
+            const teamPicks = teamGroups[teamName].sort((a,b) => a.overallPick - b.overallPick);
+            const card = document.createElement('div');
+            card.className = 'team-card';
+
+            let rosterHTML = teamPicks.map(p => {
+                const posClass = `pos-${escapeHTML(p.position)}`;
+                return `
+                    <li class="roster-item">
+                        <div>
+                            <span class="pos-badge ${posClass}">${escapeHTML(p.position)}</span>
+                            <strong style="margin-left:0.3rem">${escapeHTML(p.name)}</strong>
+                        </div>
+                        <span style="color:var(--text-sub)">R${p.roundTaken} (#${p.overallPick})</span>
+                    </li>
+                `;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="team-title">
+                    <span>${escapeHTML(teamName)}</span>
+                    <span style="font-size:0.75rem; color:var(--text-sub)">${teamPicks.length} Players</span>
+                </div>
+                <ul class="roster-list">${rosterHTML}</ul>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function toggleView(e) {
+        const view = e.target.value;
+        document.getElementById('board-view').classList.toggle('hidden', view !== 'board');
+        document.getElementById('table-view').classList.toggle('hidden', view !== 'table');
+        document.getElementById('teams-view').classList.toggle('hidden', view !== 'teams');
+    }
+</script>
+
+</body>
+</html>
