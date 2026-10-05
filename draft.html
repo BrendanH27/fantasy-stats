@@ -298,20 +298,15 @@
             <div class="control-group">
                 <label for="view-select">View Format: </label>
                 <select id="view-select">
-                    <option value="board" selected>Draft Board</option>
-                    <option value="table">Draft Log (Table)</option>
+                    <option value="table" selected>Draft Log (Table)</option>
+                    <option value="board">Draft Board</option>
                     <option value="teams">Rosters by Team</option>
                 </select>
             </div>
         </div>
 
-        <!-- View 1: Draft Board Grid -->
-        <div id="board-view" class="draft-board-container">
-            <div id="draft-board" class="draft-board"></div>
-        </div>
-
-        <!-- View 2: Table View -->
-        <div id="table-view" class="hidden">
+        <!-- View 1: Table View (DEFAULT) -->
+        <div id="table-view">
             <table>
                 <thead>
                     <tr>
@@ -320,13 +315,17 @@
                         <th>Player</th>
                         <th>Pos</th>
                         <th>Drafted By</th>
-                        <th>Pos Rank</th>
+                        <th>Pos Rank (Drafted)</th>
                         <th>PPG</th>
-                        <th>Total Pts</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
             </table>
+        </div>
+
+        <!-- View 2: Draft Board Grid -->
+        <div id="board-view" class="draft-board-container hidden">
+            <div id="draft-board" class="draft-board"></div>
         </div>
 
         <!-- View 3: Team Rosters -->
@@ -435,7 +434,7 @@
 
         document.getElementById('status-message').classList.add('hidden');
         document.getElementById('draft-dashboard').classList.remove('hidden');
-        document.getElementById('league-title').textContent = `${activeLeagueData.league_name || 'League'} - Draft Board`;
+        document.getElementById('league-title').textContent = `${activeLeagueData.league_name || 'League'} - Draft Log`;
 
         const draftData = activeLeagueData.draft;
         const filteredPicks = getFilteredDraftPicks();
@@ -455,13 +454,13 @@
 
         const totalPicks = draft.length;
         
-        // Find Highest Scorer
-        const topScorer = [...draft].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))[0];
+        // Find Highest PPG Scorer
+        const topScorer = [...draft].sort((a, b) => (b.pointsPerGame || 0) - (a.pointsPerGame || 0))[0];
         
-        // Find "Best Value" (high points picked late)
+        // Find Best Value Pick
         const bestValue = [...draft].sort((a, b) => {
-            const valA = (a.totalPoints || 0) * (a.overallPick || 1);
-            const valB = (b.totalPoints || 0) * (b.overallPick || 1);
+            const valA = (a.pointsPerGame || 0) * (a.overallPick || 1);
+            const valB = (b.pointsPerGame || 0) * (b.overallPick || 1);
             return valB - valA;
         })[0];
 
@@ -471,17 +470,17 @@
                 <div class="summary-val">${totalPicks}</div>
             </div>
             <div class="summary-card">
-                <div class="summary-title">Top Drafted Scorer</div>
+                <div class="summary-title">Top PPG Drafted</div>
                 <div class="summary-val" style="font-size: 1rem;">
                     ${escapeHTML(topScorer?.name || 'N/A')}
-                    <br><span style="font-size:0.8rem; color: var(--text-sub)">${topScorer?.totalPoints || 0} pts</span>
+                    <br><span style="font-size:0.8rem; color: var(--text-sub)">${topScorer?.pointsPerGame || 0} PPG</span>
                 </div>
             </div>
             <div class="summary-card">
                 <div class="summary-title">Best Value Pick</div>
                 <div class="summary-val" style="font-size: 1rem;">
                     ${escapeHTML(bestValue?.name || 'N/A')}
-                    <br><span style="font-size:0.8rem; color: var(--text-sub)">Pick #${bestValue?.overallPick} (${bestValue?.totalPoints || 0} pts)</span>
+                    <br><span style="font-size:0.8rem; color: var(--text-sub)">Pick #${bestValue?.overallPick} (${bestValue?.pointsPerGame || 0} PPG)</span>
                 </div>
             </div>
         `;
@@ -496,7 +495,6 @@
             return;
         }
 
-        // Determine unique teams to calculate draft columns
         const teamsSet = new Set(activeLeagueData.draft.map(p => p.takenBy));
         const numTeams = teamsSet.size || 10;
 
@@ -507,7 +505,7 @@
             pickDiv.className = 'board-pick';
             
             const posClass = `pos-${escapeHTML(pick.position)}`;
-            const pts = pick.totalPoints !== undefined ? `${pick.totalPoints} pts` : '';
+            const ppg = pick.pointsPerGame !== undefined ? `${pick.pointsPerGame} PPG` : '';
 
             pickDiv.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -517,7 +515,7 @@
                 <div class="player-name" title="${escapeHTML(pick.name)}">${escapeHTML(pick.name)}</div>
                 <div style="font-size:0.65rem; color: var(--text-sub); display:flex; justify-content:space-between;">
                     <span>${escapeHTML(pick.takenBy)}</span>
-                    <span style="color:var(--accent)">${pts}</span>
+                    <span style="color:var(--accent)">${ppg}</span>
                 </div>
             `;
             board.appendChild(pickDiv);
@@ -531,6 +529,10 @@
         picks.forEach(pick => {
             const tr = document.createElement('tr');
             const posClass = `pos-${escapeHTML(pick.position)}`;
+            
+            // Format position taken: e.g., #69 (RB1) or #8 (WR1)
+            const posRankStr = pick.positionRank ? `#${pick.positionRank}` : '-';
+            const numPosTakenStr = pick.numOfPositionTaken ? ` (${pick.position}${pick.numOfPositionTaken})` : '';
 
             tr.innerHTML = `
                 <td><strong>#${pick.overallPick}</strong></td>
@@ -538,9 +540,8 @@
                 <td><strong>${escapeHTML(pick.name)}</strong></td>
                 <td><span class="pos-badge ${posClass}">${escapeHTML(pick.position)}</span></td>
                 <td>${escapeHTML(pick.takenBy)}</td>
-                <td>#${pick.positionRank || '-'}</td>
-                <td>${pick.pointsPerGame !== undefined ? pick.pointsPerGame : '-'}</td>
-                <td style="color: var(--accent); font-weight: bold;">${pick.totalPoints !== undefined ? pick.totalPoints : '-'}</td>
+                <td>${posRankStr}${numPosTakenStr}</td>
+                <td style="color: var(--accent); font-weight: bold;">${pick.pointsPerGame !== undefined ? pick.pointsPerGame : '-'}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -550,7 +551,6 @@
         const container = document.getElementById('teams-view');
         container.innerHTML = '';
 
-        // Group picks by team name
         const teamGroups = {};
         picks.forEach(pick => {
             if (!teamGroups[pick.takenBy]) teamGroups[pick.takenBy] = [];
@@ -564,11 +564,14 @@
 
             let rosterHTML = teamPicks.map(p => {
                 const posClass = `pos-${escapeHTML(p.position)}`;
+                const posRankStr = p.positionRank ? ` #${p.positionRank}` : '';
+
                 return `
                     <li class="roster-item">
                         <div>
                             <span class="pos-badge ${posClass}">${escapeHTML(p.position)}</span>
                             <strong style="margin-left:0.3rem">${escapeHTML(p.name)}</strong>
+                            <span style="font-size:0.75rem; color:var(--text-sub)">(${p.position}${posRankStr})</span>
                         </div>
                         <span style="color:var(--text-sub)">R${p.roundTaken} (#${p.overallPick})</span>
                     </li>
