@@ -161,6 +161,7 @@
         .slot-pill-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            grid-auto-flow: column; /* Forces items to fill top-to-bottom per column instead of left-to-right */
             gap: 0.5rem;
         }
         .slot-pill {
@@ -379,7 +380,6 @@
                 });
             }
             
-            // Sort slot keys using the custom user-defined preferred order
             let slotKeys = Array.from(slotKeysSet).sort((a, b) => {
                 let indexA = PREFERRED_SLOT_ORDER.indexOf(a.toUpperCase());
                 let indexB = PREFERRED_SLOT_ORDER.indexOf(b.toUpperCase());
