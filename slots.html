@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy League - Points Per Slot Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --error-bg: #450a0a;
+            --error-text: #fca5a5;
+            --error-border: #7f1d1d;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        select {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+        #status-message {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            margin-top: 3rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .status-error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+        }
+        .table-container {
+            overflow-x: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: rgba(0,0,0,0.3);
+            color: var(--accent);
+            position: sticky;
+            top: 0;
+        }
+        tr:hover td {
+            background: rgba(56, 189, 248, 0.05);
+        }
+        .team-col {
+            font-weight: bold;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .team-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--border);
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="league-title">Points Per Slot Dashboard</h1>
+            <p style="color: var(--text-sub); margin: 0;">Analyze performance production breakdown across individual roster positions and slots.</p>
+        </header>
+
+        <div id="status-message">Loading slot data...</div>
+
+        <div id="dashboard" class="hidden">
+            <div class="controls">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div class="control-group hidden" id="year-select-container">
+                        <label for="year-select">Season: </label>
+                        <select id="year-select"></select>
+                    </div>
+                    <div class="control-group">
+                        <label for="week-select">View Segment: </label>
+                        <select id="week-select"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr id="table-head-row">
+                            <th>Team</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rawJSONData = null;
+        let activeLeagueData = null;
+        const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="10" font-family="sans-serif">LOGO</text></svg>';
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                showError("Cannot fetch JSON using file:// protocol. Please open via local web server (e.g., Live Server in VS Code).");
+                return;
+            }
+            fetch('./league_data.json')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    return response.json();
+                })
+                .then(data => {
+                    rawJSONData = data;
+                    initYearAndDashboard();
+                })
+                .catch(error => {
+                    console.error("Error loading JSON:", error);
+                    showError(`Failed to load 'league_data.json': ${error.message}`);
+                });
+        });
+
+        function showError(msg) {
+            const statusMsg = document.getElementById('status-message');
+            statusMsg.textContent = msg;
+            statusMsg.classList.add('status-error');
+            statusMsg.classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function initYearAndDashboard() {
+            if (!rawJSONData) return;
+            let rootData = rawJSONData.data || rawJSONData;
+            let years = [];
+
+            if (!Array.isArray(rootData) && typeof rootData === 'object') {
+                const keys = Object.keys(rootData);
+                years = keys.filter(k => !isNaN(parseInt(k, 10))).sort((a, b) => b - a);
+            }
+
+            const yearSelectContainer = document.getElementById('year-select-container');
+            const yearSelect = document.getElementById('year-select');
+
+            if (years.length > 0) {
+                yearSelect.innerHTML = years.map(y => `<option value="${y}">Season ${y}</option>`).join('');
+                yearSelectContainer.classList.remove('hidden');
+                yearSelect.onchange = (e) => {
+                    activeLeagueData = rootData[e.target.value];
+                    setupWeekSelectorAndRender();
+                };
+                activeLeagueData = rootData[years[0]];
+            } else {
+                yearSelectContainer.classList.add('hidden');
+                activeLeagueData = rootData;
+            }
+            setupWeekSelectorAndRender();
+        }
+
+        function setupWeekSelectorAndRender() {
+            if (!activeLeagueData || !activeLeagueData.teams) {
+                showError("JSON structure missing expected 'teams' object.");
+                return;
+            }
+
+            document.getElementById('status-message').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('league-title').textContent = (activeLeagueData.league_name || "Fantasy League") + " - Points Per Slot";
+
+            const teams = Object.values(activeLeagueData.teams);
+            if (teams.length === 0) return;
+
+            // Determine total weeks available based on slot_points_per_week length
+            const totalWeeks = teams[0].slot_points_per_week ? teams[0].slot_points_per_week.length : 0;
+            const weekSelect = document.getElementById('week-select');
+            weekSelect.innerHTML = '';
+
+            // Cumulative Totals option
+            const seasonOpt = document.createElement('option');
+            seasonOpt.value = 'season_totals';
+            seasonOpt.textContent = `Cumulative Slot Totals (Weeks 1–${totalWeeks})`;
+            weekSelect.appendChild(seasonOpt);
+
+            // Weekly options
+            for (let i = 1; i <= totalWeeks; i++) {
+                const opt = document.createElement('option');
+                opt.value = i - 1;
+                opt.textContent = `Week ${i}`;
+                weekSelect.appendChild(opt);
+            }
+
+            renderSlotData('season_totals');
+            weekSelect.onchange = (e) => {
+                const val = e.target.value;
+                renderSlotData(val === 'season_totals' ? val : parseInt(val, 10));
+            };
+        }
+
+        function renderSlotData(selection) {
+            const teams = Object.values(activeLeagueData.teams);
+            
+            // Discover all distinct slot keys dynamically across all teams/weeks
+            let slotKeysSet = new Set();
+            teams.forEach(team => {
+                if (Array.isArray(team.slot_points_per_week)) {
+                    team.slot_points_per_week.forEach(weekObj => {
+                        if (weekObj) {
+                            Object.keys(weekObj).forEach(slot => slotKeysSet.add(slot));
+                        }
+                    });
+                }
+            });
+            // Sort slot keys logically if possible, or alphabetically
+            const slotKeys = Array.from(slotKeysSet).sort();
+
+            // Build Table Headers dynamically
+            const theadRow = document.getElementById('table-head-row');
+            theadRow.innerHTML = `
+                <th>Team</th>
+                <th>Owner</th>
+                ${slotKeys.map(slot => `<th>${escapeHTML(slot)}</th>`).join('')}
+                <th style="color: var(--accent);">Total Slot Points</th>
+            `;
+
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            teams.forEach(team => {
+                let ownerName = 'Unknown';
+                if (team.owner && team.owner[0]) {
+                    ownerName = `${team.owner[0].firstName || ''} ${team.owner[0].lastName || ''}`.trim() || team.owner[0].displayName || 'Unknown';
+                } else if (typeof team.owner === 'string') {
+                    ownerName = team.owner;
+                }
+
+                const safeTeamName = escapeHTML(team.name || 'Team');
+                const safeOwnerName = escapeHTML(ownerName);
+                const logoUrl = team.logo ? escapeHTML(team.logo) : PLACEHOLOGO;
+
+                // Aggregate or pull values based on selection
+                let computedSlots = {};
+                slotKeys.forEach(k => computedSlots[k] = 0);
+                let grandTotal = 0;
+
+                if (selection === 'season_totals') {
+                    if (Array.isArray(team.slot_points_per_week)) {
+                        team.slot_points_per_week.forEach(weekObj => {
+                            if (weekObj) {
+                                for (let [slot, pts] of Object.entries(weekObj)) {
+                                    computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    const weekIdx = selection;
+                    const weekObj = team.slot_points_per_week?.[weekIdx];
+                    if (weekObj) {
+                        for (let [slot, pts] of Object.entries(weekObj)) {
+                            computedSlots[slot] = pts || 0;
+                        }
+                    }
+                }
+
+                // Calculate row total sum
+                slotKeys.forEach(slot => {
+                    grandTotal += computedSlots[slot];
+                });
+
+                // Construct row HTML
+                const tr = document.createElement('tr');
+                let slotCellsHTML = slotKeys.map(slot => `<td>${computedSlots[slot].toFixed(2)}</td>`).join('');
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="team-col">
+                            <img class="team-logo" src="${team.logo ? escapeHTML(team.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
+                            <span>${safeTeamName}</span>
+                        </div>
+                    </td>
+                    <td>${safeOwnerName}</td>
+                    ${slotCellsHTML}
+                    <td style="color: var(--accent); font-weight: bold;">${grandTotal.toFixed(2)}</td>
+                `;
+
+                // Logo error fallback
+                const imgElement = tr.querySelector('.team-logo');
+                imgElement.addEventListener('error', function() {
+                    this.src = PLACEHOLDER_LOGO;
+                }, { once: true });
+
+                tableBody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
