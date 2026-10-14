@@ -210,7 +210,7 @@
                         <label for="calc-mode-select">Display Mode: </label>
                         <select id="calc-mode-select">
                             <option value="totals">Totals</option>
-                            <option value="average">Per-Game Average</option>
+                            <option value="average" selected>Per-Game Average</option>
                         </select>
                     </div>
                 </div>
@@ -247,6 +247,7 @@
         let currentSortColumn = null;
         let currentSortDirection = 'desc'; // 'asc' or 'desc'
 
+        const PREFERRED_SLOT_ORDER = ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX1', 'FLEX2', 'K', 'D/ST', 'DST'];
         const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="10" font-family="sans-serif">LOGO</text></svg>';
 
         function escapeHTML(str) {
@@ -344,7 +345,6 @@
                 weekSelect.appendChild(opt);
             }
 
-            // Event Listeners for UI state updates
             weekSelect.onchange = triggerRender;
             document.getElementById('calc-mode-select').onchange = triggerRender;
             document.getElementById('view-style-select').onchange = toggleViewStyle;
@@ -370,7 +370,7 @@
 
         function getProcessedTeamSlotData(team) {
             const selection = document.getElementById('week-select').value;
-            const mode = document.getElementById('calc-mode-select').value; // 'totals' or 'average'
+            const mode = document.getElementById('calc-mode-select').value;
 
             let slotKeysSet = new Set();
             if (Array.isArray(team.slot_points_per_week)) {
@@ -378,7 +378,16 @@
                     if (wObj) Object.keys(wObj).forEach(s => slotKeysSet.add(s));
                 });
             }
-            const slotKeys = Array.from(slotKeysSet).sort();
+            
+            // Sort slot keys using the custom user-defined preferred order
+            let slotKeys = Array.from(slotKeysSet).sort((a, b) => {
+                let indexA = PREFERRED_SLOT_ORDER.indexOf(a.toUpperCase());
+                let indexB = PREFERRED_SLOT_ORDER.indexOf(b.toUpperCase());
+                if (indexA === -1) indexA = 999;
+                if (indexB === -1) indexB = 999;
+                if (indexA !== indexB) return indexA - indexB;
+                return a.localeCompare(b);
+            });
 
             let computedSlots = {};
             slotKeys.forEach(k => computedSlots[k] = 0);
@@ -406,7 +415,6 @@
                 }
             }
 
-            // If average mode is selected, divide cumulative slot numbers by game count
             let grandTotal = 0;
             slotKeys.forEach(slot => {
                 if (mode === 'average' && gameCount > 0) {
@@ -437,14 +445,11 @@
             const teamsArray = Object.values(teamsObj);
             if (teamsArray.length === 0) return;
 
-            // Gather global slot keys from the first team for column uniformity
             let sampleTeamProcessed = getProcessedTeamSlotData(teamsArray[0]);
             let slotKeys = sampleTeamProcessed.slotKeys;
 
-            // Process all teams data
             let processedTeams = teamsArray.map(team => getProcessedTeamSlotData(team));
 
-            // Sorting logic if user clicked a column header
             if (currentSortColumn) {
                 processedTeams.sort((a, b) => {
                     let valA, valB;
@@ -477,15 +482,14 @@
                 <th data-sort="total" style="color: var(--accent);">Total <span class="sort-indicator">${currentSortColumn === 'total' ? (currentSortDirection === 'asc' ? '▲' : '▼') : ''}</span></th>
             `;
 
-            // Attach click handler for table sorting
-            theadRow.querySelectorAll('th').thforEach ? null : theadRow.querySelectorAll('th').forEach(th => {
+            theadRow.querySelectorAll('th').forEach(th => {
                 th.onclick = () => {
                     const sortKey = th.getAttribute('data-sort');
                     if (currentSortColumn === sortKey) {
                         currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
                     } else {
                         currentSortColumn = sortKey;
-                        currentSortDirection = 'desc'; // default high-to-low for stats
+                        currentSortDirection = 'desc';
                     }
                     renderSlotData();
                 };
@@ -517,7 +521,7 @@
                 tableBody.appendChild(tr);
             });
 
-            // 2. Render Cards View (Per-Team Card Layout)
+            // 2. Render Cards View
             const cardsContainer = document.getElementById('cards-view');
             cardsContainer.innerHTML = '';
 
