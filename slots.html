@@ -94,17 +94,18 @@
             top: 0;
             cursor: pointer;
             user-select: none;
+            transition: background 0.2s;
         }
         th:hover {
             background: rgba(56, 189, 248, 0.1);
         }
-        th::after {
-            content: ' ↕';
+        th span.sort-indicator {
             font-size: 0.8rem;
-            opacity: 0.5;
+            margin-left: 0.3rem;
+            color: var(--text-sub);
         }
         tr:hover td {
-            background: rgba(56, 189, 248, 0.05);
+            background: rgba(56, 189, 248, 0.03);
         }
         .team-col {
             font-weight: bold;
@@ -120,7 +121,7 @@
             object-fit: cover;
             background: var(--border);
         }
-        /* Cards View Styles */
+        /* Per Team View Styles */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -142,9 +143,9 @@
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.75rem;
         }
-        .team-card-logo {
-            width: 44px;
-            height: 44px;
+        .team-card-header img {
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             object-fit: cover;
             background: var(--border);
@@ -152,11 +153,33 @@
         .team-card-info h3 {
             margin: 0;
             font-size: 1.1rem;
-            color: var(--accent);
         }
         .team-card-info span {
             font-size: 0.85rem;
             color: var(--text-sub);
+        }
+        .slot-pill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .slot-pill {
+            background: rgba(0,0,0,0.2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .slot-pill-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+        .slot-pill-value {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent);
         }
         .hidden {
             display: none !important;
@@ -167,7 +190,7 @@
     <div class="container">
         <header>
             <h1 id="league-title">Points Per Slot Dashboard</h1>
-            <p style="color: var(--text-sub); margin: 0;">Analyze performance production breakdown across individual roster positions and slots.</p>
+            <p style="color: var(--text-sub); margin: 0;">Analyze production breakdowns across individual roster positions and starting slots.</p>
         </header>
 
         <div id="status-message">Loading slot data...</div>
@@ -184,17 +207,17 @@
                         <select id="week-select"></select>
                     </div>
                     <div class="control-group">
-                        <label for="metric-select">Metric Mode: </label>
-                        <select id="metric-select">
+                        <label for="calc-mode-select">Display Mode: </label>
+                        <select id="calc-mode-select">
                             <option value="totals">Totals</option>
-                            <option value="averages">Per-Game Averages</option>
+                            <option value="average">Per-Game Average</option>
                         </select>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label for="view-select">Layout Style: </label>
-                    <select id="view-select">
-                        <option value="table" selected>League Table</option>
+                    <label for="view-style-select">Layout Style: </label>
+                    <select id="view-style-select">
+                        <option value="table" selected>League-Wide Table</option>
                         <option value="cards">Per-Team Cards</option>
                     </select>
                 </div>
@@ -205,15 +228,15 @@
                 <table>
                     <thead>
                         <tr id="table-head-row">
-                            <th data-sort="team">Team</th>
-                            <th data-sort="owner">Owner</th>
+                            <th data-sort="team">Team <span class="sort-indicator"></span></th>
+                            <th data-sort="owner">Owner <span class="sort-indicator"></span></th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
 
-            <!-- Cards View (Per Team breakdown) -->
+            <!-- Cards View (Per-Team View) -->
             <div id="cards-view" class="grid hidden"></div>
         </div>
     </div>
@@ -222,7 +245,7 @@
         let rawJSONData = null;
         let activeLeagueData = null;
         let currentSortColumn = null;
-        let currentSortAscending = false;
+        let currentSortDirection = 'desc'; // 'asc' or 'desc'
 
         const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="10" font-family="sans-serif">LOGO</text></svg>';
 
@@ -311,7 +334,7 @@
 
             const seasonOpt = document.createElement('option');
             seasonOpt.value = 'season_totals';
-            seasonOpt.textContent = `Full Season (Weeks 1–${totalWeeks})`;
+            seasonOpt.textContent = `All Weeks (1–${totalWeeks})`;
             weekSelect.appendChild(seasonOpt);
 
             for (let i = 1; i <= totalWeeks; i++) {
@@ -321,207 +344,219 @@
                 weekSelect.appendChild(opt);
             }
 
-            renderDashboard();
+            // Event Listeners for UI state updates
+            weekSelect.onchange = triggerRender;
+            document.getElementById('calc-mode-select').onchange = triggerRender;
+            document.getElementById('view-style-select').onchange = toggleViewStyle;
 
-            weekSelect.onchange = renderDashboard;
-            document.getElementById('metric-select').onchange = renderDashboard;
-            document.getElementById('view-select').onchange = toggleViewMode;
+            triggerRender();
         }
 
-        function toggleViewMode(e) {
-            const mode = e.target.value;
-            if (mode === 'cards') {
+        function triggerRender() {
+            renderSlotData();
+        }
+
+        function toggleViewStyle(e) {
+            const style = e.target.value;
+            if (style === 'cards') {
                 document.getElementById('cards-view').classList.remove('hidden');
                 document.getElementById('table-view').classList.add('hidden');
             } else {
                 document.getElementById('cards-view').classList.add('hidden');
                 document.getElementById('table-view').classList.remove('hidden');
             }
-            renderDashboard();
+            renderSlotData();
         }
 
-        function getOwnerName(team) {
-            if (team.owner && team.owner[0]) {
-                return `${team.owner[0].firstName || ''} ${team.owner[0].lastName || ''}`.trim() || team.owner[0].displayName || 'Unknown';
-            } else if (typeof team.owner === 'string') {
-                return team.owner;
-            }
-            return 'Unknown';
-        }
-
-        function renderDashboard() {
+        function getProcessedTeamSlotData(team) {
             const selection = document.getElementById('week-select').value;
-            const metricMode = document.getElementById('metric-select').value;
-            const viewMode = document.getElementById('view-select').value;
-            const teams = Object.values(activeLeagueData.teams);
+            const mode = document.getElementById('calc-mode-select').value; // 'totals' or 'average'
 
-            // Discover slot keys dynamically
             let slotKeysSet = new Set();
-            teams.forEach(team => {
-                if (Array.isArray(team.slot_points_per_week)) {
-                    team.slot_points_per_week.forEach(weekObj => {
-                        if (weekObj) Object.keys(weekObj).forEach(slot => slotKeysSet.add(slot));
-                    });
-                }
-            });
+            if (Array.isArray(team.slot_points_per_week)) {
+                team.slot_points_per_week.forEach(wObj => {
+                    if (wObj) Object.keys(wObj).forEach(s => slotKeysSet.add(s));
+                });
+            }
             const slotKeys = Array.from(slotKeysSet).sort();
 
-            if (viewMode === 'table') {
-                renderTableView(teams, slotKeys, selection, metricMode);
-            } else {
-                renderCardsView(teams, slotKeys, selection, metricMode);
-            }
-        }
+            let computedSlots = {};
+            slotKeys.forEach(k => computedSlots[k] = 0);
+            let gameCount = 0;
 
-        function renderTableView(teams, slotKeys, selection, metricMode) {
-            const theadRow = document.getElementById('table-head-row');
-            theadRow.innerHTML = `
-                <th data-sort="team">Team</th>
-                <th data-sort="owner">Owner</th>
-                ${slotKeys.map(slot => `<th data-sort="${slot}">${escapeHTML(slot)}</th>`).join('')}
-                <th data-sort="grandTotal" style="color: var(--accent);">${metricMode === 'averages' ? 'Avg Total' : 'Total Slot Pts'}</th>
-            `;
-
-            // Attach sorting events to headers
-            theadRow.querySelectorAll('th').th.forEach = undefined; // safety
-            theadRow.querySelectorAll('th').forEach(th => {
-                th.onclick = () => {
-                    const sortKey = th.getAttribute('data-sort');
-                    if (currentSortColumn === sortKey) {
-                        currentSortAscending = !currentSortAscending;
-                    } else {
-                        currentSortColumn = sortKey;
-                        currentSortAscending = false; // default high-to-low for points
-                    }
-                    renderDashboard();
-                };
-            });
-
-            // Process data per team
-            let processedTeams = teams.map(team => {
-                let computedSlots = {};
-                slotKeys.forEach(k => computedSlots[k] = 0);
-                let weeksCount = 0;
-                let grandTotal = 0;
-
-                if (selection === 'season_totals') {
-                    if (Array.isArray(team.slot_points_per_week)) {
-                        team.slot_points_per_week.forEach(weekObj => {
-                            if (weekObj) {
-                                weeksCount++;
-                                for (let [slot, pts] of Object.entries(weekObj)) {
-                                    computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
-                                }
+            if (selection === 'season_totals') {
+                if (Array.isArray(team.slot_points_per_week)) {
+                    team.slot_points_per_week.forEach(weekObj => {
+                        if (weekObj) {
+                            gameCount++;
+                            for (let [slot, pts] of Object.entries(weekObj)) {
+                                computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
                             }
-                        });
-                    }
-                } else {
-                    weeksCount = 1;
-                    const weekIdx = parseInt(selection, 10);
-                    const weekObj = team.slot_points_per_week?.[weekIdx];
-                    if (weekObj) {
-                        for (let [slot, pts] of Object.entries(weekObj)) {
-                            computedSlots[slot] = pts || 0;
                         }
-                    }
-                }
-
-                // If metricMode is averages, compute per-game values
-                if (metricMode === 'averages' && weeksCount > 0) {
-                    slotKeys.forEach(slot => {
-                        computedSlots[slot] = computedSlots[slot] / weeksCount;
                     });
                 }
+            } else {
+                const weekIdx = parseInt(selection, 10);
+                const weekObj = team.slot_points_per_week?.[weekIdx];
+                gameCount = 1;
+                if (weekObj) {
+                    for (let [slot, pts] of Object.entries(weekObj)) {
+                        computedSlots[slot] = pts || 0;
+                    }
+                }
+            }
 
-                slotKeys.forEach(slot => {
-                    grandTotal += computedSlots[slot];
-                });
-
-                return {
-                    name: team.name || 'Team',
-                    owner: getOwnerName(team),
-                    logo: team.logo,
-                    slots: computedSlots,
-                    grandTotal: grandTotal,
-                    rawTeam: team
-                };
+            // If average mode is selected, divide cumulative slot numbers by game count
+            let grandTotal = 0;
+            slotKeys.forEach(slot => {
+                if (mode === 'average' && gameCount > 0) {
+                    computedSlots[slot] = computedSlots[slot] / gameCount;
+                }
+                grandTotal += computedSlots[slot];
             });
 
-            // Sort data if requested
+            let ownerName = 'Unknown';
+            if (team.owner && team.owner[0]) {
+                ownerName = `${team.owner[0].firstName || ''} ${team.owner[0].lastName || ''}`.trim() || team.owner[0].displayName || 'Unknown';
+            } else if (typeof team.owner === 'string') {
+                ownerName = team.owner;
+            }
+
+            return {
+                teamName: team.name || 'Team',
+                ownerName: ownerName,
+                logo: team.logo || '',
+                slots: computedSlots,
+                slotKeys: slotKeys,
+                grandTotal: grandTotal
+            };
+        }
+
+        function renderSlotData() {
+            const teamsObj = activeLeagueData.teams;
+            const teamsArray = Object.values(teamsObj);
+            if (teamsArray.length === 0) return;
+
+            // Gather global slot keys from the first team for column uniformity
+            let sampleTeamProcessed = getProcessedTeamSlotData(teamsArray[0]);
+            let slotKeys = sampleTeamProcessed.slotKeys;
+
+            // Process all teams data
+            let processedTeams = teamsArray.map(team => getProcessedTeamSlotData(team));
+
+            // Sorting logic if user clicked a column header
             if (currentSortColumn) {
                 processedTeams.sort((a, b) => {
                     let valA, valB;
                     if (currentSortColumn === 'team') {
-                        valA = a.name; valB = b.name;
+                        valA = a.teamName.toLowerCase();
+                        valB = b.teamName.toLowerCase();
                     } else if (currentSortColumn === 'owner') {
-                        valA = a.owner; valB = b.owner;
-                    } else if (currentSortColumn === 'grandTotal') {
-                        valA = a.grandTotal; valB = b.grandTotal;
+                        valA = a.ownerName.toLowerCase();
+                        valB = b.ownerName.toLowerCase();
+                    } else if (currentSortColumn === 'total') {
+                        valA = a.grandTotal;
+                        valB = b.grandTotal;
                     } else {
                         valA = a.slots[currentSortColumn] || 0;
                         valB = b.slots[currentSortColumn] || 0;
                     }
 
-                    if (typeof valA === 'string') {
-                        return currentSortAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                    }
-                    return currentSortAscending ? valA - valB : valB - valA;
+                    if (valA < valB) return currentSortDirection === 'asc' ? -1 : 1;
+                    if (valA > valB) return currentSortDirection === 'asc' ? 1 : -1;
+                    return 0;
                 });
             }
+
+            // 1. Render Table View
+            const theadRow = document.getElementById('table-head-row');
+            theadRow.innerHTML = `
+                <th data-sort="team">Team <span class="sort-indicator">${currentSortColumn === 'team' ? (currentSortDirection === 'asc' ? '▲' : '▼') : ''}</span></th>
+                <th data-sort="owner">Owner <span class="sort-indicator">${currentSortColumn === 'owner' ? (currentSortDirection === 'asc' ? '▲' : '▼') : ''}</span></th>
+                ${slotKeys.map(slot => `<th data-sort="${slot}">${escapeHTML(slot)} <span class="sort-indicator">${currentSortColumn === slot ? (currentSortDirection === 'asc' ? '▲' : '▼') : ''}</span></th>`).join('')}
+                <th data-sort="total" style="color: var(--accent);">Total <span class="sort-indicator">${currentSortColumn === 'total' ? (currentSortDirection === 'asc' ? '▲' : '▼') : ''}</span></th>
+            `;
+
+            // Attach click handler for table sorting
+            theadRow.querySelectorAll('th').thforEach ? null : theadRow.querySelectorAll('th').forEach(th => {
+                th.onclick = () => {
+                    const sortKey = th.getAttribute('data-sort');
+                    if (currentSortColumn === sortKey) {
+                        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortColumn = sortKey;
+                        currentSortDirection = 'desc'; // default high-to-low for stats
+                    }
+                    renderSlotData();
+                };
+            });
 
             const tableBody = document.getElementById('table-body');
             tableBody.innerHTML = '';
 
-            processedTeams.forEach(item => {
-                const safeTeamName = escapeHTML(item.name);
-                const safeOwnerName = escapeHTML(item.owner);
-                let slotCellsHTML = slotKeys.map(slot => `<td>${item.slots[slot].toFixed(2)}</td>`).join('');
+            processedTeams.forEach(data => {
+                const safeTeamName = escapeHTML(data.teamName);
+                const safeOwnerName = escapeHTML(data.ownerName);
+                let slotCellsHTML = slotKeys.map(slot => `<td>${(data.slots[slot] || 0).toFixed(2)}</td>`).join('');
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
                         <div class="team-col">
-                            <img class="team-logo" src="${item.logo ? escapeHTML(item.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
+                            <img class="team-logo" src="${data.logo ? escapeHTML(data.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
                             <span>${safeTeamName}</span>
                         </div>
                     </td>
                     <td>${safeOwnerName}</td>
                     ${slotCellsHTML}
-                    <td style="color: var(--accent); font-weight: bold;">${item.grandTotal.toFixed(2)}</td>
+                    <td style="color: var(--accent); font-weight: bold;">${data.grandTotal.toFixed(2)}</td>
                 `;
 
-                const imgElement = tr.querySelector('.team-logo');
-                imgElement.addEventListener('error', function() { this.src = PLACEHOLDER_LOGO; }, { once: true });
+                const img = tr.querySelector('.team-logo');
+                img.addEventListener('error', function() { this.src = PLACEHOLDER_LOGO; }, { once: true });
                 tableBody.appendChild(tr);
             });
-        }
 
-        function renderCardsView(teams, slotKeys, selection, metricMode) {
+            // 2. Render Cards View (Per-Team Card Layout)
             const cardsContainer = document.getElementById('cards-view');
             cardsContainer.innerHTML = '';
 
-            teams.forEach(team => {
-                const safeTeamName = escapeHTML(team.name || 'Team');
-                const safeOwnerName = escapeHTML(getOwnerName(team));
-                const logoUrl = team.logo ? escapeHTML(team.logo) : PLACEHOLDER_LOGO;
+            processedTeams.forEach(data => {
+                const safeTeamName = escapeHTML(data.teamName);
+                const safeOwnerName = escapeHTML(data.ownerName);
 
-                let computedSlots = {};
-                slotKeys.forEach(k => computedSlots[k] = 0);
-                let weeksCount = 0;
-                let grandTotal = 0;
+                const card = document.createElement('div');
+                card.className = 'team-card';
 
-                if (selection === 'season_totals') {
-                    if (Array.isArray(team.slot_points_per_week)) {
-                        team.slot_points_per_week.forEach(weekObj => {
-                            if (weekObj) {
-                                weeksCount++;
-                                for (let [slot, pts] of Object.entries(weekObj)) {
-                                    computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    weeksCount = 1;
-                    const weekIdx = parseInt(selection, 10);
-                    const weekObj = team.slot_points_per
+                let pillsHTML = slotKeys.map(slot => `
+                    <div class="slot-pill">
+                        <span class="slot-pill-label">${escapeHTML(slot)}</span>
+                        <span class="slot-pill-value">${(data.slots[slot] || 0).toFixed(2)}</span>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="team-card-header">
+                        <img src="${data.logo ? escapeHTML(data.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
+                        <div class="team-card-info">
+                            <h3>${safeTeamName}</h3>
+                            <span>Owner: ${safeOwnerName}</span>
+                        </div>
+                    </div>
+                    <div class="slot-pill-grid">
+                        ${pillsHTML}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 0.5rem; font-weight: bold;">
+                        <span>Total Production</span>
+                        <span style="color: var(--accent); font-size: 1.1rem;">${data.grandTotal.toFixed(2)}</span>
+                    </div>
+                `;
+
+                const cardImg = card.querySelector('img');
+                cardImg.addEventListener('error', function() { this.src = PLACEHOLDER_LOGO; }, { once: true });
+                cardsContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
