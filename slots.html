@@ -92,6 +92,16 @@
             color: var(--accent);
             position: sticky;
             top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover {
+            background: rgba(56, 189, 248, 0.1);
+        }
+        th::after {
+            content: ' ↕';
+            font-size: 0.8rem;
+            opacity: 0.5;
         }
         tr:hover td {
             background: rgba(56, 189, 248, 0.05);
@@ -109,6 +119,44 @@
             border-radius: 50%;
             object-fit: cover;
             background: var(--border);
+        }
+        /* Cards View Styles */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .team-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+        }
+        .team-card-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--border);
+        }
+        .team-card-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+        .team-card-info span {
+            font-size: 0.85rem;
+            color: var(--text-sub);
         }
         .hidden {
             display: none !important;
@@ -135,26 +183,47 @@
                         <label for="week-select">View Segment: </label>
                         <select id="week-select"></select>
                     </div>
+                    <div class="control-group">
+                        <label for="metric-select">Metric Mode: </label>
+                        <select id="metric-select">
+                            <option value="totals">Totals</option>
+                            <option value="averages">Per-Game Averages</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="view-select">Layout Style: </label>
+                    <select id="view-select">
+                        <option value="table" selected>League Table</option>
+                        <option value="cards">Per-Team Cards</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="table-container">
+            <!-- Table View -->
+            <div id="table-view" class="table-container">
                 <table>
                     <thead>
                         <tr id="table-head-row">
-                            <th>Team</th>
-                            <th>Owner</th>
+                            <th data-sort="team">Team</th>
+                            <th data-sort="owner">Owner</th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
+
+            <!-- Cards View (Per Team breakdown) -->
+            <div id="cards-view" class="grid hidden"></div>
         </div>
     </div>
 
     <script>
         let rawJSONData = null;
         let activeLeagueData = null;
+        let currentSortColumn = null;
+        let currentSortAscending = false;
+
         const PLACEHOLDER_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="%2394a3b8" font-size="10" font-family="sans-serif">LOGO</text></svg>';
 
         function escapeHTML(str) {
@@ -236,18 +305,15 @@
             const teams = Object.values(activeLeagueData.teams);
             if (teams.length === 0) return;
 
-            // Determine total weeks available based on slot_points_per_week length
             const totalWeeks = teams[0].slot_points_per_week ? teams[0].slot_points_per_week.length : 0;
             const weekSelect = document.getElementById('week-select');
             weekSelect.innerHTML = '';
 
-            // Cumulative Totals option
             const seasonOpt = document.createElement('option');
             seasonOpt.value = 'season_totals';
-            seasonOpt.textContent = `Cumulative Slot Totals (Weeks 1–${totalWeeks})`;
+            seasonOpt.textContent = `Full Season (Weeks 1–${totalWeeks})`;
             weekSelect.appendChild(seasonOpt);
 
-            // Weekly options
             for (let i = 1; i <= totalWeeks; i++) {
                 const opt = document.createElement('option');
                 opt.value = i - 1;
@@ -255,63 +321,94 @@
                 weekSelect.appendChild(opt);
             }
 
-            renderSlotData('season_totals');
-            weekSelect.onchange = (e) => {
-                const val = e.target.value;
-                renderSlotData(val === 'season_totals' ? val : parseInt(val, 10));
-            };
+            renderDashboard();
+
+            weekSelect.onchange = renderDashboard;
+            document.getElementById('metric-select').onchange = renderDashboard;
+            document.getElementById('view-select').onchange = toggleViewMode;
         }
 
-        function renderSlotData(selection) {
+        function toggleViewMode(e) {
+            const mode = e.target.value;
+            if (mode === 'cards') {
+                document.getElementById('cards-view').classList.remove('hidden');
+                document.getElementById('table-view').classList.add('hidden');
+            } else {
+                document.getElementById('cards-view').classList.add('hidden');
+                document.getElementById('table-view').classList.remove('hidden');
+            }
+            renderDashboard();
+        }
+
+        function getOwnerName(team) {
+            if (team.owner && team.owner[0]) {
+                return `${team.owner[0].firstName || ''} ${team.owner[0].lastName || ''}`.trim() || team.owner[0].displayName || 'Unknown';
+            } else if (typeof team.owner === 'string') {
+                return team.owner;
+            }
+            return 'Unknown';
+        }
+
+        function renderDashboard() {
+            const selection = document.getElementById('week-select').value;
+            const metricMode = document.getElementById('metric-select').value;
+            const viewMode = document.getElementById('view-select').value;
             const teams = Object.values(activeLeagueData.teams);
-            
-            // Discover all distinct slot keys dynamically across all teams/weeks
+
+            // Discover slot keys dynamically
             let slotKeysSet = new Set();
             teams.forEach(team => {
                 if (Array.isArray(team.slot_points_per_week)) {
                     team.slot_points_per_week.forEach(weekObj => {
-                        if (weekObj) {
-                            Object.keys(weekObj).forEach(slot => slotKeysSet.add(slot));
-                        }
+                        if (weekObj) Object.keys(weekObj).forEach(slot => slotKeysSet.add(slot));
                     });
                 }
             });
-            // Sort slot keys logically if possible, or alphabetically
             const slotKeys = Array.from(slotKeysSet).sort();
 
-            // Build Table Headers dynamically
+            if (viewMode === 'table') {
+                renderTableView(teams, slotKeys, selection, metricMode);
+            } else {
+                renderCardsView(teams, slotKeys, selection, metricMode);
+            }
+        }
+
+        function renderTableView(teams, slotKeys, selection, metricMode) {
             const theadRow = document.getElementById('table-head-row');
             theadRow.innerHTML = `
-                <th>Team</th>
-                <th>Owner</th>
-                ${slotKeys.map(slot => `<th>${escapeHTML(slot)}</th>`).join('')}
-                <th style="color: var(--accent);">Total Slot Points</th>
+                <th data-sort="team">Team</th>
+                <th data-sort="owner">Owner</th>
+                ${slotKeys.map(slot => `<th data-sort="${slot}">${escapeHTML(slot)}</th>`).join('')}
+                <th data-sort="grandTotal" style="color: var(--accent);">${metricMode === 'averages' ? 'Avg Total' : 'Total Slot Pts'}</th>
             `;
 
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
+            // Attach sorting events to headers
+            theadRow.querySelectorAll('th').th.forEach = undefined; // safety
+            theadRow.querySelectorAll('th').forEach(th => {
+                th.onclick = () => {
+                    const sortKey = th.getAttribute('data-sort');
+                    if (currentSortColumn === sortKey) {
+                        currentSortAscending = !currentSortAscending;
+                    } else {
+                        currentSortColumn = sortKey;
+                        currentSortAscending = false; // default high-to-low for points
+                    }
+                    renderDashboard();
+                };
+            });
 
-            teams.forEach(team => {
-                let ownerName = 'Unknown';
-                if (team.owner && team.owner[0]) {
-                    ownerName = `${team.owner[0].firstName || ''} ${team.owner[0].lastName || ''}`.trim() || team.owner[0].displayName || 'Unknown';
-                } else if (typeof team.owner === 'string') {
-                    ownerName = team.owner;
-                }
-
-                const safeTeamName = escapeHTML(team.name || 'Team');
-                const safeOwnerName = escapeHTML(ownerName);
-                const logoUrl = team.logo ? escapeHTML(team.logo) : PLACEHOLOGO;
-
-                // Aggregate or pull values based on selection
+            // Process data per team
+            let processedTeams = teams.map(team => {
                 let computedSlots = {};
                 slotKeys.forEach(k => computedSlots[k] = 0);
+                let weeksCount = 0;
                 let grandTotal = 0;
 
                 if (selection === 'season_totals') {
                     if (Array.isArray(team.slot_points_per_week)) {
                         team.slot_points_per_week.forEach(weekObj => {
                             if (weekObj) {
+                                weeksCount++;
                                 for (let [slot, pts] of Object.entries(weekObj)) {
                                     computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
                                 }
@@ -319,7 +416,8 @@
                         });
                     }
                 } else {
-                    const weekIdx = selection;
+                    weeksCount = 1;
+                    const weekIdx = parseInt(selection, 10);
                     const weekObj = team.slot_points_per_week?.[weekIdx];
                     if (weekObj) {
                         for (let [slot, pts] of Object.entries(weekObj)) {
@@ -328,36 +426,102 @@
                     }
                 }
 
-                // Calculate row total sum
+                // If metricMode is averages, compute per-game values
+                if (metricMode === 'averages' && weeksCount > 0) {
+                    slotKeys.forEach(slot => {
+                        computedSlots[slot] = computedSlots[slot] / weeksCount;
+                    });
+                }
+
                 slotKeys.forEach(slot => {
                     grandTotal += computedSlots[slot];
                 });
 
-                // Construct row HTML
-                const tr = document.createElement('tr');
-                let slotCellsHTML = slotKeys.map(slot => `<td>${computedSlots[slot].toFixed(2)}</td>`).join('');
+                return {
+                    name: team.name || 'Team',
+                    owner: getOwnerName(team),
+                    logo: team.logo,
+                    slots: computedSlots,
+                    grandTotal: grandTotal,
+                    rawTeam: team
+                };
+            });
 
+            // Sort data if requested
+            if (currentSortColumn) {
+                processedTeams.sort((a, b) => {
+                    let valA, valB;
+                    if (currentSortColumn === 'team') {
+                        valA = a.name; valB = b.name;
+                    } else if (currentSortColumn === 'owner') {
+                        valA = a.owner; valB = b.owner;
+                    } else if (currentSortColumn === 'grandTotal') {
+                        valA = a.grandTotal; valB = b.grandTotal;
+                    } else {
+                        valA = a.slots[currentSortColumn] || 0;
+                        valB = b.slots[currentSortColumn] || 0;
+                    }
+
+                    if (typeof valA === 'string') {
+                        return currentSortAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                    return currentSortAscending ? valA - valB : valB - valA;
+                });
+            }
+
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            processedTeams.forEach(item => {
+                const safeTeamName = escapeHTML(item.name);
+                const safeOwnerName = escapeHTML(item.owner);
+                let slotCellsHTML = slotKeys.map(slot => `<td>${item.slots[slot].toFixed(2)}</td>`).join('');
+
+                const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
                         <div class="team-col">
-                            <img class="team-logo" src="${team.logo ? escapeHTML(team.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
+                            <img class="team-logo" src="${item.logo ? escapeHTML(item.logo) : PLACEHOLDER_LOGO}" alt="${safeTeamName}">
                             <span>${safeTeamName}</span>
                         </div>
                     </td>
                     <td>${safeOwnerName}</td>
                     ${slotCellsHTML}
-                    <td style="color: var(--accent); font-weight: bold;">${grandTotal.toFixed(2)}</td>
+                    <td style="color: var(--accent); font-weight: bold;">${item.grandTotal.toFixed(2)}</td>
                 `;
 
-                // Logo error fallback
                 const imgElement = tr.querySelector('.team-logo');
-                imgElement.addEventListener('error', function() {
-                    this.src = PLACEHOLDER_LOGO;
-                }, { once: true });
-
+                imgElement.addEventListener('error', function() { this.src = PLACEHOLDER_LOGO; }, { once: true });
                 tableBody.appendChild(tr);
             });
         }
-    </script>
-</body>
-</html>
+
+        function renderCardsView(teams, slotKeys, selection, metricMode) {
+            const cardsContainer = document.getElementById('cards-view');
+            cardsContainer.innerHTML = '';
+
+            teams.forEach(team => {
+                const safeTeamName = escapeHTML(team.name || 'Team');
+                const safeOwnerName = escapeHTML(getOwnerName(team));
+                const logoUrl = team.logo ? escapeHTML(team.logo) : PLACEHOLDER_LOGO;
+
+                let computedSlots = {};
+                slotKeys.forEach(k => computedSlots[k] = 0);
+                let weeksCount = 0;
+                let grandTotal = 0;
+
+                if (selection === 'season_totals') {
+                    if (Array.isArray(team.slot_points_per_week)) {
+                        team.slot_points_per_week.forEach(weekObj => {
+                            if (weekObj) {
+                                weeksCount++;
+                                for (let [slot, pts] of Object.entries(weekObj)) {
+                                    computedSlots[slot] = (computedSlots[slot] || 0) + (pts || 0);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    weeksCount = 1;
+                    const weekIdx = parseInt(selection, 10);
+                    const weekObj = team.slot_points_per
