@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy League - Trade History</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+            --error-bg: #450a0a;
+            --error-text: #fca5a5;
+            --error-border: #7f1d1d;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            color: var(--text-sub);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            color: var(--accent);
+        }
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        select {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+        /* Status & Empty states */
+        #status-message {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            margin-top: 3rem;
+            padding: 2rem;
+            border-radius: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+        .status-error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Trades Grid/List */
+        .trades-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .trade-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .trade-teams {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .trade-teams span {
+            color: var(--accent);
+        }
+        .trade-week {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        /* Assets Grid Layout */
+        .trade-assets-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .trade-assets-grid {
+                grid-template-columns: 1fr;
+            }
+            .trade-arrow {
+                text-align: center;
+                transform: rotate(90deg);
+                margin: 0.5rem 0;
+            }
+        }
+        .asset-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .asset-box h4 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .player-item:last-child {
+            margin-bottom: 0;
+        }
+        .player-name {
+            font-weight: 500;
+        }
+        .player-points {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+        .trade-arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="./index.html" class="back-link">&larr; Back to Main Dashboard</a>
+        <header>
+            <h1 id="league-title">League Trade History</h1>
+        </header>
+
+        <div class="controls">
+            <div class="control-group hidden" id="year-select-container">
+                <label for="year-select">Season: </label>
+                <select id="year-select"></select>
+            </div>
+        </div>
+
+        <div id="status-message">Loading trade data...</div>
+        <div id="trades-wrapper" class="hidden">
+            <div id="trades-list" class="trades-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let rawJSONData = null;
+        let activeYearData = null;
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                showStatus("Cannot fetch JSON using file:// protocol. Please open via local web server (e.g., Live Server).", true);
+                return;
+            }
+            fetch('./league_data.json')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    return response.json();
+                })
+                .then(data => {
+                    rawJSONData = data;
+                    initYearSelector();
+                })
+                .catch(error => {
+                    console.error("Error loading JSON:", error);
+                    showStatus(`Failed to load 'league_data.json': ${error.message}`, true);
+                });
+        });
+
+        function showStatus(msg, isError = false) {
+            const statusMsg = document.getElementById('status-message');
+            statusMsg.textContent = msg;
+            statusMsg.classList.toggle('status-error', isError);
+            statusMsg.classList.remove('hidden');
+            document.getElementById('trades-wrapper').classList.add('hidden');
+        }
+
+        function initYearSelector() {
+            let rootData = rawJSONData.data || rawJSONData;
+            let years = [];
+
+            if (!Array.isArray(rootData) && typeof rootData === 'object') {
+                const keys = Object.keys(rootData);
+                years = keys.filter(k => !isNaN(parseInt(k, 10))).sort((a, b) => b - a);
+            }
+
+            const yearSelectContainer = document.getElementById('year-select-container');
+            const yearSelect = document.getElementById('year-select');
+
+            if (years.length > 0) {
+                yearSelect.innerHTML = years.map(y => `<option value="${y}">Season ${y}</option>`).join('');
+                yearSelectContainer.classList.remove('hidden');
+                yearSelect.onchange = (e) => {
+                    activeYearData = rootData[e.target.value];
+                    renderTrades();
+                };
+                activeYearData = rootData[years[0]];
+            } else {
+                activeYearData = rootData;
+                yearSelectContainer.classList.add('hidden');
+            }
+
+            // Set League Title if available
+            if (activeYearData.league_name) {
+                document.getElementById('league-title').textContent = `${activeYearData.league_name} - Trades`;
+            }
+
+            renderTrades();
+        }
+
+        function renderTrades() {
+            const listContainer = document.getElementById('trades-list');
+            listContainer.innerHTML = '';
+
+            // Check if trades data exists and is populated
+            if (!activeYearData.trades || !Array.isArray(activeYearData.trades) || activeYearData.trades.length === 0) {
+                showStatus("No trades recorded for this season.");
+                return;
+            }
+
+            document.getElementById('status-message').classList.add('hidden');
+            document.getElementById('trades-wrapper').classList.remove('hidden');
+
+            // Build a fast lookup map for player info
+            activeYearData.trades.forEach(trade => {
+                const playerMap = {};
+                if (trade.playerInfo) {
+                    trade.playerInfo.forEach(p => { playerMap[p.playerId] = p; });
+                }
+
+                const team1Name = escapeHTML(trade.team1Name || `Team ${trade.team1id}`);
+                const team2Name = escapeHTML(trade.team2Name || `Team ${trade.team2id}`);
+                const weekLabel = trade.WeekofTrade === 100 ? 'Offseason / Preseason' : `Week ${trade.WeekofTrade}`;
+
+                // Helper to render players going to a team based on ID list
+                function renderPlayerList(playerIds) {
+                    if (!playerIds || playerIds.length === 0) return '<em style="color:var(--text-sub)">None / Draft Picks Only</em>';
+                    return playerIds.map(id => {
+                        const info = playerMap[id];
+                        const name = info ? escapeHTML(info.playerName) : `Player ID: ${id}`;
+                        
+                        // Calculate total pre-trade points if available
+                        let ptsText = '';
+                        if (info && info.pretradePoints && info.pretradePoints.length > 0) {
+                            const sum = info.pretradePoints.reduce((a, b) => a + (b || 0), 0).toFixed(1);
+                            ptsText = `<span class="player-points">(${sum} pts prior)</span>`;
+                        }
+                        return `<div class="player-item"><span class="player-name">${name}</span> ${ptsText}</div>`;
+                    }).join('');
+                }
+
+                const card = document.createElement('div');
+                card.className = 'trade-card';
+                card.innerHTML = `
+                    <div class="trade-header">
+                        <div class="trade-teams"><span>${team1Name}</span> &harr; <span>${team2Name}</span></div>
+                        <div class="trade-week">${weekLabel}</div>
+                    </div>
+                    <div class="trade-assets-grid">
+                        <div class="asset-box">
+                            <h4>Received by ${team1Name}</h4>
+                            ${renderPlayerList(trade.playersToT1)}
+                        </div>
+                        <div class="trade-arrow">&larr;&rarr;</div>
+                        <div class="asset-box">
+                            <h4>Received by ${team2Name}</h4>
+                            ${renderPlayerList(trade.playersToT2)}
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
