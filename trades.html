@@ -8,6 +8,7 @@
         :root {
             --bg-color: #0f172a;
             --card-bg: #1e293b;
+            --card-hover: #27354f;
             --accent: #38bdf8;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
@@ -101,6 +102,12 @@
             border-radius: 10px;
             padding: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .trade-card:hover {
+            background: var(--card-hover);
+            border-color: var(--accent);
         }
         .trade-header {
             display: flex;
@@ -120,6 +127,11 @@
         .trade-teams span {
             color: var(--accent);
         }
+        .trade-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
         .trade-week {
             background: rgba(56, 189, 248, 0.1);
             color: var(--accent);
@@ -128,6 +140,10 @@
             font-size: 0.85rem;
             font-weight: bold;
             border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        .click-hint {
+            font-size: 0.8rem;
+            color: var(--text-sub);
         }
         /* Assets Grid Layout */
         .trade-assets-grid {
@@ -183,6 +199,84 @@
             text-align: center;
             font-size: 1.5rem;
             color: var(--text-sub);
+        }
+
+        /* Expanded Details Drawer */
+        .trade-details-drawer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, margin-top 0.3s ease-out;
+            border-top: 0px solid var(--border);
+            margin-top: 0;
+        }
+        .trade-card.expanded .trade-details-drawer {
+            max-height: 1000px;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+            transition: max-height 0.5s ease-in, margin-top 0.3s ease-in;
+        }
+        .details-section-title {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        .player-stat-row {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+        .player-stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .stats-breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        @media(max-width: 600px) {
+            .stats-breakdown-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .stat-subblock {
+            background: var(--card-bg);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .stat-subblock-title {
+            color: var(--text-sub);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.05em;
+        }
+        .weekly-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-bottom: 0.35rem;
+        }
+        .pill {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--text-main);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .summary-line {
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 0.25rem;
         }
     </style>
 </head>
@@ -273,7 +367,6 @@
                 yearSelectContainer.classList.add('hidden');
             }
 
-            // Set League Title if available
             if (activeYearData.league_name) {
                 document.getElementById('league-title').textContent = `${activeYearData.league_name} - Trades`;
             }
@@ -281,11 +374,21 @@
             renderTrades();
         }
 
+        function calcStats(arr) {
+            if (!arr || arr.length === 0) return { total: '0.00', avg: '0.00', count: 0 };
+            const total = arr.reduce((sum, val) => sum + (val || 0), 0);
+            const avg = total / arr.length;
+            return {
+                total: total.toFixed(2),
+                avg: avg.toFixed(2),
+                count: arr.length
+            };
+        }
+
         function renderTrades() {
             const listContainer = document.getElementById('trades-list');
             listContainer.innerHTML = '';
 
-            // Check if trades data exists and is populated
             if (!activeYearData.trades || !Array.isArray(activeYearData.trades) || activeYearData.trades.length === 0) {
                 showStatus("No trades recorded for this season.");
                 return;
@@ -294,8 +397,7 @@
             document.getElementById('status-message').classList.add('hidden');
             document.getElementById('trades-wrapper').classList.remove('hidden');
 
-            // Build a fast lookup map for player info
-            activeYearData.trades.forEach(trade => {
+            activeYearData.trades.forEach((trade, index) => {
                 const playerMap = {};
                 if (trade.playerInfo) {
                     trade.playerInfo.forEach(p => { playerMap[p.playerId] = p; });
@@ -305,21 +407,59 @@
                 const team2Name = escapeHTML(trade.team2Name || `Team ${trade.team2id}`);
                 const weekLabel = trade.WeekofTrade === 100 ? 'Offseason / Preseason' : `Week ${trade.WeekofTrade}`;
 
-                // Helper to render players going to a team based on ID list
                 function renderPlayerList(playerIds) {
                     if (!playerIds || playerIds.length === 0) return '<em style="color:var(--text-sub)">None / Draft Picks Only</em>';
                     return playerIds.map(id => {
                         const info = playerMap[id];
                         const name = info ? escapeHTML(info.playerName) : `Player ID: ${id}`;
                         
-                        // Calculate total pre-trade points if available
                         let ptsText = '';
                         if (info && info.pretradePoints && info.pretradePoints.length > 0) {
-                            const sum = info.pretradePoints.reduce((a, b) => a + (b || 0), 0).toFixed(1);
-                            ptsText = `<span class="player-points">(${sum} pts prior)</span>`;
+                            const stats = calcStats(info.pretradePoints);
+                            ptsText = `<span class="player-points">(${stats.total} pts prior | Avg: ${stats.avg})</span>`;
                         }
                         return `<div class="player-item"><span class="player-name">${name}</span> ${ptsText}</div>`;
                     }).join('');
+                }
+
+                // Build detailed breakdown HTML for the expandable drawer
+                let detailedPlayersHTML = '';
+                if (trade.playerInfo && trade.playerInfo.length > 0) {
+                    detailedPlayersHTML = trade.playerInfo.map(p => {
+                        const pre = calcStats(p.pretradePoints);
+                        const post = calcStats(p.posttradePoints);
+
+                        const prePills = p.pretradePoints && p.pretradePoints.length > 0 
+                            ? p.pretradePoints.map(val => `<span class="pill">${val.toFixed(1)}</span>`).join('')
+                            : '<em style="color:var(--text-sub)">No data recorded</em>';
+
+                        const postPills = p.posttradePoints && p.posttradePoints.length > 0 
+                            ? p.posttradePoints.map(val => `<span class="pill">${val.toFixed(1)}</span>`).join('')
+                            : '<em style="color:var(--text-sub)">No data recorded</em>';
+
+                        return `
+                            <div class="player-stat-row">
+                                <div class="player-stat-header">
+                                    <span>${escapeHTML(p.playerName)}</span>
+                                    <span style="color:var(--text-sub); font-size:0.8rem;">Bye Week: ${p.byeWeek || 'N/A'}</span>
+                                </div>
+                                <div class="stats-breakdown-grid">
+                                    <div class="stat-subblock">
+                                        <div class="stat-subblock-title">Pre-Trade Performance</div>
+                                        <div class="weekly-pills">${prePills}</div>
+                                        <div class="summary-line">Total: ${pre.total} pts &bull; Avg: ${pre.avg}/wk</div>
+                                    </div>
+                                    <div class="stat-subblock">
+                                        <div class="stat-subblock-title">Post-Trade Performance</div>
+                                        <div class="weekly-pills">${postPills}</div>
+                                        <div class="summary-line">Total: ${post.total} pts &bull; Avg: ${post.avg}/wk</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    detailedPlayersHTML = '<p style="color: var(--text-sub); font-size: 0.9rem;">No granular player performance data attached to this trade.</p>';
                 }
 
                 const card = document.createElement('div');
@@ -327,7 +467,10 @@
                 card.innerHTML = `
                     <div class="trade-header">
                         <div class="trade-teams"><span>${team1Name}</span> &harr; <span>${team2Name}</span></div>
-                        <div class="trade-week">${weekLabel}</div>
+                        <div class="trade-meta">
+                            <span class="trade-week">${weekLabel}</span>
+                            <span class="click-hint">&#9660; Click to view stats</span>
+                        </div>
                     </div>
                     <div class="trade-assets-grid">
                         <div class="asset-box">
@@ -340,7 +483,24 @@
                             ${renderPlayerList(trade.playersToT2)}
                         </div>
                     </div>
+                    <div class="trade-details-drawer">
+                        <div class="details-section-title">Player Performance Breakdown (Pre vs Post Trade)</div>
+                        ${detailedPlayersHTML}
+                    </div>
                 `;
+
+                // Toggle click behavior
+                card.addEventListener('click', (e) => {
+                    // Prevent any text selection triggers from conflicting
+                    card.classList.toggle('expanded');
+                    const hint = card.querySelector('.click-hint');
+                    if (card.classList.contains('expanded')) {
+                        hint.innerHTML = '&#9650; Click to collapse';
+                    } else {
+                        hint.innerHTML = '&#9660; Click to view stats';
+                    }
+                });
+
                 listContainer.appendChild(card);
             });
         }
