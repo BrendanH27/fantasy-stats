@@ -13,7 +13,8 @@
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
             --border: #334155;
-            --success: #22c55e;
+            --badge-bg: #f59e0b;
+            --badge-text: #0f172a;
             --error-bg: #450a0a;
             --error-text: #fca5a5;
             --error-border: #7f1d1d;
@@ -210,7 +211,7 @@
             margin-top: 0;
         }
         .trade-card.expanded .trade-details-drawer {
-            max-height: 1000px;
+            max-height: 1200px;
             margin-top: 1.5rem;
             border-top: 1px solid var(--border);
             padding-top: 1.25rem;
@@ -269,14 +270,22 @@
         .pill {
             background: rgba(56, 189, 248, 0.15);
             color: var(--text-main);
-            padding: 0.1rem 0.4rem;
+            padding: 0.15rem 0.45rem;
             border-radius: 4px;
             font-size: 0.75rem;
+        }
+        .pill.bye {
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            font-weight: bold;
+            padding: 0.15rem 0.5rem;
+            letter-spacing: 0.05em;
         }
         .summary-line {
             color: var(--accent);
             font-weight: bold;
             margin-top: 0.25rem;
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -374,14 +383,35 @@
             renderTrades();
         }
 
-        function calcStats(arr) {
-            if (!arr || arr.length === 0) return { total: '0.00', avg: '0.00', count: 0 };
-            const total = arr.reduce((sum, val) => sum + (val || 0), 0);
-            const avg = total / arr.length;
+        /**
+         * Calculates total points, average per active game, and counts bye weeks.
+         */
+        function calcStats(pointsArray, byeWeekNum, startWeekNum) {
+            if (!pointsArray || pointsArray.length === 0) return { total: '0.00', avg: '0.00', games: 0, byes: 0 };
+            
+            let total = 0;
+            let countedGames = 0;
+            let byeCount = 0;
+
+            pointsArray.forEach((val, idx) => {
+                const absoluteWeekNum = startWeekNum + idx;
+                const score = val || 0;
+
+                if (byeWeekNum && absoluteWeekNum === byeWeekNum) {
+                    byeCount += 1;
+                    return; // Skip bye week score and denominator count
+                }
+
+                total += score;
+                countedGames += 1;
+            });
+
+            const avg = countedGames > 0 ? total / countedGames : 0;
             return {
                 total: total.toFixed(2),
                 avg: avg.toFixed(2),
-                count: arr.length
+                games: countedGames,
+                byes: byeCount
             };
         }
 
@@ -397,7 +427,7 @@
             document.getElementById('status-message').classList.add('hidden');
             document.getElementById('trades-wrapper').classList.remove('hidden');
 
-            activeYearData.trades.forEach((trade, index) => {
+            activeYearData.trades.forEach((trade) => {
                 const playerMap = {};
                 if (trade.playerInfo) {
                     trade.playerInfo.forEach(p => { playerMap[p.playerId] = p; });
@@ -405,7 +435,8 @@
 
                 const team1Name = escapeHTML(trade.team1Name || `Team ${trade.team1id}`);
                 const team2Name = escapeHTML(trade.team2Name || `Team ${trade.team2id}`);
-                const weekLabel = trade.WeekofTrade === 100 ? 'Offseason / Preseason' : `Week ${trade.WeekofTrade}`;
+                const tradeWeek = trade.WeekofTrade === 100 ? 100 : parseInt(trade.WeekofTrade, 10);
+                const weekLabel = tradeWeek === 100 ? 'Offseason / Preseason' : `Week ${tradeWeek}`;
 
                 function renderPlayerList(playerIds) {
                     if (!playerIds || playerIds.length === 0) return '<em style="color:var(--text-sub)">None / Draft Picks Only</em>';
@@ -415,44 +446,64 @@
                         
                         let ptsText = '';
                         if (info && info.pretradePoints && info.pretradePoints.length > 0) {
-                            const stats = calcStats(info.pretradePoints);
+                            const stats = calcStats(info.pretradePoints, info.byeWeek, 1);
                             ptsText = `<span class="player-points">(${stats.total} pts prior | Avg: ${stats.avg})</span>`;
                         }
                         return `<div class="player-item"><span class="player-name">${name}</span> ${ptsText}</div>`;
                     }).join('');
                 }
 
-                // Build detailed breakdown HTML for the expandable drawer
                 let detailedPlayersHTML = '';
                 if (trade.playerInfo && trade.playerInfo.length > 0) {
                     detailedPlayersHTML = trade.playerInfo.map(p => {
-                        const pre = calcStats(p.pretradePoints);
-                        const post = calcStats(p.posttradePoints);
+                        const bye = p.byeWeek ? parseInt(p.byeWeek, 10) : 0;
+                        const preStartWeek = 1;
+                        const postStartWeek = tradeWeek === 100 ? 1 : tradeWeek + 1;
 
+                        const preStats = calcStats(p.pretradePoints, bye, preStartWeek);
+                        const postStats = calcStats(p.posttradePoints, bye, postStartWeek);
+
+                        // Build pills for pretrade points with clear BYE tags
                         const prePills = p.pretradePoints && p.pretradePoints.length > 0 
-                            ? p.pretradePoints.map(val => `<span class="pill">${val.toFixed(1)}</span>`).join('')
+                            ? p.pretradePoints.map((val, idx) => {
+                                const absWk = preStartWeek + idx;
+                                const isBye = (bye && absWk === bye);
+                                return isBye 
+                                    ? `<span class="pill bye" title="Week ${absWk} Bye Week">BYE (Wk ${absWk})</span>` 
+                                    : `<span class="pill">${val.toFixed(1)}</span>`;
+                              }).join('')
                             : '<em style="color:var(--text-sub)">No data recorded</em>';
 
+                        // Build pills for posttrade points with clear BYE tags
                         const postPills = p.posttradePoints && p.posttradePoints.length > 0 
-                            ? p.posttradePoints.map(val => `<span class="pill">${val.toFixed(1)}</span>`).join('')
+                            ? p.posttradePoints.map((val, idx) => {
+                                const absWk = postStartWeek + idx;
+                                const isBye = (bye && absWk === bye);
+                                return isBye 
+                                    ? `<span class="pill bye" title="Week ${absWk} Bye Week">BYE (Wk ${absWk})</span>` 
+                                    : `<span class="pill">${val.toFixed(1)}</span>`;
+                              }).join('')
                             : '<em style="color:var(--text-sub)">No data recorded</em>';
+
+                        const preByeNote = preStats.byes > 0 ? ` &bull; <em>(${preStats.byes} bye excluded)</em>` : '';
+                        const postByeNote = postStats.byes > 0 ? ` &bull; <em>(${postStats.byes} bye excluded)</em>` : '';
 
                         return `
                             <div class="player-stat-row">
                                 <div class="player-stat-header">
                                     <span>${escapeHTML(p.playerName)}</span>
-                                    <span style="color:var(--text-sub); font-size:0.8rem;">Bye Week: ${p.byeWeek || 'N/A'}</span>
+                                    <span style="color:var(--text-sub); font-size:0.8rem;">Bye Week: ${bye ? `Week ${bye}` : 'None'}</span>
                                 </div>
                                 <div class="stats-breakdown-grid">
                                     <div class="stat-subblock">
                                         <div class="stat-subblock-title">Pre-Trade Performance</div>
                                         <div class="weekly-pills">${prePills}</div>
-                                        <div class="summary-line">Total: ${pre.total} pts &bull; Avg: ${pre.avg}/wk</div>
+                                        <div class="summary-line">Total: ${preStats.total} pts &bull; Avg: ${preStats.avg}/wk${preByeNote}</div>
                                     </div>
                                     <div class="stat-subblock">
                                         <div class="stat-subblock-title">Post-Trade Performance</div>
                                         <div class="weekly-pills">${postPills}</div>
-                                        <div class="summary-line">Total: ${post.total} pts &bull; Avg: ${post.avg}/wk</div>
+                                        <div class="summary-line">Total: ${postStats.total} pts &bull; Avg: ${postStats.avg}/wk${postByeNote}</div>
                                     </div>
                                 </div>
                             </div>
@@ -489,9 +540,7 @@
                     </div>
                 `;
 
-                // Toggle click behavior
-                card.addEventListener('click', (e) => {
-                    // Prevent any text selection triggers from conflicting
+                card.addEventListener('click', () => {
                     card.classList.toggle('expanded');
                     const hint = card.querySelector('.click-hint');
                     if (card.classList.contains('expanded')) {
